@@ -7,10 +7,10 @@ Maybe: AJ2A, AN6, AN8, P4A
 Our team is building a TableTop RPG scheduling app that assists playgroups with
 logistical challenges.  Our app would allow hosts to easily keep track of 
 the multitude of scheduling responsibilities; including: meeting times, player 
-availability, meeing locations, player availability, food responsibilities, and
-carpooling.  Players will be able to upload their availability which will be 
-seen by the host and the host can then propose a schedule that will be 
-accepted by the players who are available to participate.  
+availability, meeing locations, food responsibilities, and carpooling.  Players 
+will be able to upload their availability which will be seen by the host and 
+the host can then propose a schedule that will be accepted by the players who 
+are available to participate.
 
 Our app will also include some more specific features available to hosts.  
 Many TTRPG apps will include features related to the game itself; including: 
