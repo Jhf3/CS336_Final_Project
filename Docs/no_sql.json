@@ -1,0 +1,17 @@
+[
+  "GroupName/ID": {
+    "hostName": "",
+    "members": [
+      {
+        "memberName": ""
+      }
+    ],
+    "pastSessions": [
+      {
+        "isConfirmed": bool,
+        "sessionDate": "",
+        "hostNotes": "",
+      }
+    ],
+  }
+]
