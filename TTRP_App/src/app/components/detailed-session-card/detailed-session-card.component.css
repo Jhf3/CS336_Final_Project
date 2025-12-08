@@ -1,0 +1,98 @@
+.detailed-session-card {
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 16px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  width: 50vw;
+  max-width: 50vw;
+}
+
+.session-header {
+  border-bottom: 3px solid #e0e0e0;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+.session-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+.session-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail-section {
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid #4a90e2;
+}
+
+.detail-section h3 {
+  margin: 0 0 8px 0;
+  color: #555;
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+.detail-content {
+  margin: 0;
+  color: #666;
+  line-height: 1.5;
+}
+
+.player-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.player-list li {
+  padding: 6px 0;
+  color: #666;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.player-list li:last-child {
+  border-bottom: none;
+}
+
+.no-data {
+  font-style: italic;
+  color: #999;
+}
+
+.dm-notes {
+  border-left-color: #f39c12;
+  background-color: #fff9f0;
+}
+
+.dm-notes h3 {
+  color: #f39c12;
+}
+
+.notes-section {
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .detailed-session-card {
+    margin: 8px;
+    padding: 16px;
+  }
+
+  .session-header h2 {
+    font-size: 1.2em;
+  }
+
+  .detail-section h3 {
+    font-size: 1em;
+  }
+}

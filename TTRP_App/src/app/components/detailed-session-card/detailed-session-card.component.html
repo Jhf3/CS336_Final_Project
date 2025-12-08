@@ -1,0 +1,53 @@
+<div class="detailed-session-card">
+  <div class="session-header">
+    <h2>{{ date | date: 'fullDate' }}</h2>
+  </div>
+
+  <div class="session-details">
+    <div class="detail-section">
+      <h3>Available Players</h3>
+      <ul class="player-list">
+        @for (player of availablePlayers; track player) {
+          <li>{{ player }}</li>
+        }
+        @empty {
+          <li class="no-data">No players available</li>
+        }
+      </ul>
+    </div>
+
+    <div class="detail-section">
+      <h3>Snacks</h3>
+      <p class="detail-content">{{ snacks || 'No snack information' }}</p>
+    </div>
+
+    <div class="detail-section">
+      <h3>Carpool</h3>
+      <p class="detail-content">{{ carpool || 'No carpool information' }}</p>
+    </div>
+
+    @if (externalAvailability) {
+      <div class="detail-section">
+        <h3>External Availability</h3>
+        <p class="detail-content">{{ externalAvailability }}</p>
+      </div>
+    }
+
+    @if (sessionSynopsis) {
+      <div class="notes-section">
+        <app-note-card 
+          [sessionDate]="date"
+          [synopsis]="sessionSynopsis">
+        </app-note-card>
+      </div>
+    }
+
+    @if (isDM && secretNotes) {
+      <div class="notes-section">
+        <app-secret-note-card 
+          [descriptiveNotes]="secretNotes">
+        </app-secret-note-card>
+      </div>
+    }
+  </div>
+</div>
