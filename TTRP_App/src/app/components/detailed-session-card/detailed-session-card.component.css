@@ -5,7 +5,8 @@
   margin: 16px;
   background-color: #ffffff;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  max-width: 600px;
+  width: 50vw;
+  max-width: 50vw;
 }
 
 .session-header {
@@ -75,6 +76,10 @@
 
 .dm-notes h3 {
   color: #f39c12;
+}
+
+.notes-section {
+  margin-top: 8px;
 }
 
 @media (max-width: 768px) {

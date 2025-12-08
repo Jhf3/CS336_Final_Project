@@ -1,4 +1,4 @@
-<div class="session-card">
+<div class="session-card" (click)="openModal()">
   <div class="session-date">
     <h3>{{ date | date: 'fullDate' }}</h3>
   </div>
@@ -13,4 +13,23 @@
       }
     </ul>
   </div>
+  <div class="click-hint">Click for details</div>
 </div>
+
+@if (showModal) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="close-button" (click)="closeModal()">✕</button>
+      <app-detailed-session-card
+        [date]="date"
+        [availablePlayers]="availablePlayers"
+        [snacks]="detailedSnacks"
+        [carpool]="detailedCarpool"
+        [externalAvailability]="detailedExternalAvailability"
+        [sessionSynopsis]="sessionSynopsis"
+        [secretNotes]="secretNotes"
+        [isDM]="isDM">
+      </app-detailed-session-card>
+    </div>
+  </div>
+}

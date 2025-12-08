@@ -33,10 +33,20 @@
       </div>
     }
 
-    @if (isDM && notes) {
-      <div class="detail-section dm-notes">
-        <h3>DM Notes</h3>
-        <p class="detail-content">{{ notes }}</p>
+    @if (sessionSynopsis) {
+      <div class="notes-section">
+        <app-note-card 
+          [sessionDate]="date"
+          [synopsis]="sessionSynopsis">
+        </app-note-card>
+      </div>
+    }
+
+    @if (isDM && secretNotes) {
+      <div class="notes-section">
+        <app-secret-note-card 
+          [descriptiveNotes]="secretNotes">
+        </app-secret-note-card>
       </div>
     }
   </div>
