@@ -1,0 +1,15 @@
+<div class="session-list-container">
+  <div class="session-list">
+    @for (session of sessions; track session.date) {
+      <app-session-card 
+        [date]="session.date" 
+        [availablePlayers]="session.availablePlayers">
+      </app-session-card>
+    }
+    @empty {
+      <div class="no-sessions">
+        <p>No sessions available</p>
+      </div>
+    }
+  </div>
+</div>
