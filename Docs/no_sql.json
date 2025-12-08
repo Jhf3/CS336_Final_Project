@@ -1,17 +1,82 @@
-[
-  "GroupName/ID": {
-    "hostName": "",
-    "members": [
-      {
-        "memberName": ""
+{
+  "description": "NoSQL Database Structure for TTRP App using Firestore",
+  "collections": {
+    "users": {
+      "document_id": "auto-generated or username-based",
+      "structure": {
+        "id": "string (document ID)",
+        "username": "string (unique)",
+        "createdAt": "Timestamp",
+        "groupIds": "array<string> (references to group documents)"
+      },
+      "example": {
+        "id": "user_12345",
+        "username": "john_doe",
+        "createdAt": "2024-01-01T00:00:00Z",
+        "groupIds": ["group_abc123", "group_def456"]
       }
-    ],
-    "pastSessions": [
-      {
-        "isConfirmed": bool,
-        "sessionDate": "",
-        "hostNotes": "",
+    },
+    "groups": {
+      "document_id": "auto-generated",
+      "structure": {
+        "id": "string (document ID)",
+        "name": "string",
+        "hostId": "string (reference to user document)",
+        "hostName": "string (denormalized)",
+        "memberIds": "array<string> (references to user documents)",
+        "createdAt": "Timestamp",
+        "updatedAt": "Timestamp"
+      },
+      "example": {
+        "id": "group_abc123",
+        "name": "Weekly D&D Campaign",
+        "hostId": "user_12345",
+        "hostName": "john_doe",
+        "memberIds": ["user_12345", "user_67890", "user_11111"],
+        "createdAt": "2024-01-01T00:00:00Z",
+        "updatedAt": "2024-01-15T00:00:00Z"
       }
-    ],
+    },
+    "sessions": {
+      "document_id": "auto-generated",
+      "structure": {
+        "id": "string (document ID)",
+        "groupId": "string (reference to group document)",
+        "groupName": "string (denormalized)",
+        "hostId": "string (reference to user document)",
+        "hostName": "string (denormalized)",
+        "isConfirmed": "boolean",
+        "sessionDate": "Timestamp",
+        "hostNotes": "string",
+        "createdAt": "Timestamp",
+        "updatedAt": "Timestamp"
+      },
+      "example": {
+        "id": "session_xyz789",
+        "groupId": "group_abc123",
+        "groupName": "Weekly D&D Campaign",
+        "hostId": "user_12345",
+        "hostName": "john_doe",
+        "isConfirmed": true,
+        "sessionDate": "2024-01-20T19:00:00Z",
+        "hostNotes": "Remember to bring character sheets. We'll be exploring the haunted castle.",
+        "createdAt": "2024-01-15T00:00:00Z",
+        "updatedAt": "2024-01-18T00:00:00Z"
+      }
+    }
+  },
+  "design_decisions": {
+    "denormalization": "Store hostName and groupName in relevant documents for easier queries and display",
+    "references": "Use document IDs as references instead of nested objects for better scalability",
+    "separate_collections": "Sessions are in a separate collection for better querying and performance",
+    "timestamps": "Use Firestore Timestamps for proper date/time handling",
+    "indexing": "Create compound indexes for common query patterns (groupId + sessionDate, hostId + createdAt)"
+  },
+  "query_patterns": {
+    "get_user_groups": "Query groups collection where memberIds array-contains userId",
+    "get_group_sessions": "Query sessions collection where groupId equals specific group",
+    "get_host_sessions": "Query sessions collection where hostId equals specific user",
+    "get_confirmed_sessions": "Query sessions where isConfirmed equals true",
+    "get_upcoming_sessions": "Query sessions where sessionDate > current timestamp"
   }
-]
+}

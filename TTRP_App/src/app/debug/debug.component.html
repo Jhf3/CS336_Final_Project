@@ -1,0 +1,238 @@
+<div class="debug-container">
+  <header class="debug-header">
+    <h1>🛠️ Database Service Debug Console</h1>
+    <div class="nav-controls">
+      <a routerLink="/" class="btn btn-secondary">← Back to Home</a>
+      <button (click)="clearResults()" class="btn btn-warning">Clear Results</button>
+    </div>
+  </header>
+
+  <div class="debug-content">
+    <!-- Test Controls Section -->
+    <section class="control-panel">
+      <h2>Test Controls</h2>
+      
+      <div class="input-group">
+        <label for="username">Test Username:</label>
+        <input 
+          id="username"
+          [(ngModel)]="testUsername" 
+          placeholder="Enter username"
+          class="form-input"
+        >
+      </div>
+      
+      <div class="input-group">
+        <label for="groupname">Test Group Name:</label>
+        <input 
+          id="groupname"
+          [(ngModel)]="testGroupName" 
+          placeholder="Enter group name"
+          class="form-input"
+        >
+      </div>
+      
+      <div class="input-group">
+        <label for="notes">Test Session Notes:</label>
+        <textarea 
+          id="notes"
+          [(ngModel)]="testSessionNotes" 
+          placeholder="Enter session notes"
+          class="form-textarea"
+          rows="3"
+        ></textarea>
+      </div>
+    </section>
+
+    <!-- Action Buttons Section -->
+    <section class="actions-panel">
+      <h2>Database Operations</h2>
+      
+      <div class="action-group">
+        <h3>User Operations</h3>
+        <div class="button-group">
+          <button 
+            (click)="createTestUser()" 
+            [disabled]="loading"
+            class="btn btn-primary"
+          >
+            Create User
+          </button>
+          
+          <button 
+            (click)="loginTestUser()" 
+            [disabled]="loading"
+            class="btn btn-primary"
+          >
+            Login User
+          </button>
+        </div>
+      </div>
+
+      <div class="action-group">
+        <h3>Group Operations</h3>
+        <div class="button-group">
+          <button 
+            (click)="createTestGroup()" 
+            [disabled]="loading || !currentUser"
+            class="btn btn-primary"
+          >
+            Create Group
+          </button>
+          
+          <button 
+            (click)="getUserGroups()" 
+            [disabled]="loading || !currentUser"
+            class="btn btn-primary"
+          >
+            Get User Groups
+          </button>
+        </div>
+      </div>
+
+      <div class="action-group">
+        <h3>Session Operations</h3>
+        <div class="button-group">
+          <button 
+            (click)="createTestSession()" 
+            [disabled]="loading || !currentGroup"
+            class="btn btn-primary"
+          >
+            Create Session
+          </button>
+          
+          <button 
+            (click)="getGroupSessions()" 
+            [disabled]="loading || !currentGroup"
+            class="btn btn-primary"
+          >
+            Get Group Sessions
+          </button>
+        </div>
+      </div>
+
+      <div class="action-group">
+        <h3>Complete Tests</h3>
+        <div class="button-group">
+          <button 
+            (click)="testCompleteFlow()" 
+            [disabled]="loading"
+            class="btn btn-success"
+          >
+            🚀 Test Complete Flow
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-panel">
+      <h2>Current State</h2>
+      
+      <div class="state-grid">
+        <div class="state-card">
+          <h4>Current User</h4>
+          <div class="state-content" *ngIf="currentUser; else noUser">
+            <p><strong>Username:</strong> {{ currentUser.username }}</p>
+            <p><strong>ID:</strong> {{ currentUser.id }}</p>
+            <p><strong>Created:</strong> {{ formatTimestamp(currentUser.createdAt) }}</p>
+            <p><strong>Groups:</strong> {{ currentUser.groupIds.length }}</p>
+          </div>
+          <ng-template #noUser>
+            <p class="no-data">No user logged in</p>
+          </ng-template>
+        </div>
+
+        <div class="state-card">
+          <h4>Current Group</h4>
+          <div class="state-content" *ngIf="currentGroup; else noGroup">
+            <p><strong>Name:</strong> {{ currentGroup.name }}</p>
+            <p><strong>ID:</strong> {{ currentGroup.id }}</p>
+            <p><strong>Host:</strong> {{ currentGroup.hostName }}</p>
+            <p><strong>Members:</strong> {{ currentGroup.memberIds.length }}</p>
+          </div>
+          <ng-template #noGroup>
+            <p class="no-data">No group selected</p>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Data Tables -->
+      <div class="data-tables">
+        <div class="table-section" *ngIf="allGroups.length > 0">
+          <h4>User Groups ({{ allGroups.length }})</h4>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Host</th>
+                  <th>Members</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let group of allGroups">
+                  <td>{{ group.name }}</td>
+                  <td>{{ group.hostName }}</td>
+                  <td>{{ group.memberIds.length }}</td>
+                  <td>{{ formatTimestamp(group.createdAt) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="table-section" *ngIf="allSessions.length > 0">
+          <h4>Group Sessions ({{ allSessions.length }})</h4>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Confirmed</th>
+                  <th>Group</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let session of allSessions">
+                  <td>{{ formatTimestamp(session.sessionDate) }}</td>
+                  <td>
+                    <span class="status-badge" [class.confirmed]="session.isConfirmed">
+                      {{ session.isConfirmed ? 'Yes' : 'No' }}
+                    </span>
+                  </td>
+                  <td>{{ session.groupName }}</td>
+                  <td class="notes-cell">{{ session.hostNotes || 'No notes' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Messages Log -->
+    <section class="messages-panel">
+      <h2>Operation Log</h2>
+      <div class="messages-container">
+        <div *ngIf="loading" class="loading-message">
+          <span class="spinner">⏳</span> Operation in progress...
+        </div>
+        <div 
+          *ngFor="let message of messages" 
+          class="message"
+          [class.success]="message.includes('✅')"
+          [class.error]="message.includes('❌')"
+          [class.info]="message.includes('🚀') || message.includes('🧹')"
+        >
+          {{ message }}
+        </div>
+        <div *ngIf="messages.length === 0" class="no-messages">
+          No operations performed yet. Try running some tests!
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
