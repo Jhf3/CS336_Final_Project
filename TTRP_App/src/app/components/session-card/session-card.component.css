@@ -1,0 +1,47 @@
+.session-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.session-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.session-date {
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.session-date h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2em;
+}
+
+.players-section h4 {
+  margin: 0 0 8px 0;
+  color: #555;
+  font-size: 1em;
+}
+
+.player-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.player-list li {
+  padding: 4px 0;
+  color: #666;
+}
+
+.no-players {
+  font-style: italic;
+  color: #999;
+}
