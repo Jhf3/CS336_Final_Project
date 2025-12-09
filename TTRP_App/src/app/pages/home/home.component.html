@@ -1,45 +1,12 @@
-<!-- TTRP App Landing Page -->
-<div class="container">
-  <header class="header">
-    <h1>{{ title() }}</h1>
-    <p class="subtitle">Plan and manage your tabletop RPG sessions with ease</p>
-  </header>
+<div class="home-container">
+  <app-navbar 
+    title="Upcoming Sessions" 
+    subtitle="Possible sessions for the next 1-2 weeks"
+    [navigationButtons]="navigationButtons">
+  </app-navbar>
 
   <main class="main-content">
-    <div class="feature-grid">
-      <div class="feature-card">
-        <h3>Create Groups</h3>
-        <p>Organize your RPG groups and manage members effortlessly</p>
-      </div>
-      
-      <div class="feature-card">
-        <h3>Schedule Sessions</h3>
-        <p>Plan upcoming sessions with dates, notes, and confirmation tracking</p>
-      </div>
-      
-      <div class="feature-card">
-        <h3>Track History</h3>
-        <p>Keep a record of all past sessions and campaign progress</p>
-      </div>
-    </div>
-
-    <div class="navigation-section">
-      <h2>Get Started</h2>
-      <div class="nav-buttons">
-        <button class="btn btn-primary" disabled>
-          Login / Register
-          <span class="coming-soon">(Coming Soon)</span>
-        </button>
-        
-        <a routerLink="/testing" class="btn btn-secondary">
-          🧪 Component Testing
-        </a>
-        
-        <a routerLink="/debug" class="btn btn-secondary">
-          🛠️ Debug Database Service
-        </a>
-      </div>
-    </div>
+    <app-session-list [sessions]="upcomingSessions"></app-session-list>
   </main>
 
   <footer class="footer">
