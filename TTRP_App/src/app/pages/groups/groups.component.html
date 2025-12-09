@@ -1,0 +1,205 @@
+<div class="groups-container">
+  <div class="groups-card">
+    <header class="groups-header">
+      <h1>Groups Management</h1>
+      <p>Create new groups or join existing ones</p>
+    </header>
+
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+      <button 
+        class="tab-button" 
+        [class.active]="activeTab === 'myGroups'"
+        (click)="setActiveTab('myGroups')"
+      >
+        My Groups ({{ userGroups.length }})
+      </button>
+      <button 
+        class="tab-button" 
+        [class.active]="activeTab === 'create'"
+        (click)="setActiveTab('create')"
+      >
+        Create Group
+      </button>
+      <button 
+        class="tab-button" 
+        [class.active]="activeTab === 'join'"
+        (click)="setActiveTab('join')"
+      >
+        Join Group
+      </button>
+    </div>
+
+    <!-- Messages -->
+    <div *ngIf="errorMessage" class="message error-message">
+      <span class="message-icon">⚠️</span>
+      {{ errorMessage }}
+      <button class="clear-btn" (click)="clearMessages()">×</button>
+    </div>
+
+    <div *ngIf="successMessage" class="message success-message">
+      <span class="message-icon">✅</span>
+      {{ successMessage }}
+      <button class="clear-btn" (click)="clearMessages()">×</button>
+    </div>
+
+    <!-- My Groups Tab -->
+    <div *ngIf="activeTab === 'myGroups'" class="tab-content">
+      <div class="groups-section">
+        <h2>My Groups</h2>
+        
+        <div *ngIf="userGroups.length === 0" class="empty-state">
+          <p>You haven't joined any groups yet.</p>
+          <p>Create a new group or join an existing one to get started!</p>
+        </div>
+
+        <div *ngIf="userGroups.length > 0" class="groups-list">
+          <div *ngFor="let group of userGroups" class="group-card">
+            <div class="group-info">
+              <h3>{{ group.name }}</h3>
+              <p class="group-host">
+                <span class="label">Host:</span> {{ group.hostName }}
+                <span *ngIf="group.hostId === currentUser?.id" class="host-badge">You</span>
+              </p>
+              <p class="group-members">
+                <span class="label">Members:</span> {{ group.memberIds.length }}
+              </p>
+              <p class="group-created">
+                <span class="label">Created:</span> {{ group.createdAt.toDate() | date:'short' }}
+              </p>
+            </div>
+            <div class="group-actions">
+              <button 
+                class="btn btn-primary"
+                (click)="onSelectGroup(group)"
+              >
+                Select Group
+              </button>
+              <button 
+                class="btn btn-secondary"
+                (click)="onLeaveGroup(group.id)"
+                *ngIf="group.hostId !== currentUser?.id"
+              >
+                Leave Group
+              </button>
+              <span *ngIf="group.hostId === currentUser?.id" class="host-indicator">
+                Group Host
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Group Tab -->
+    <div *ngIf="activeTab === 'create'" class="tab-content">
+      <div class="create-section">
+        <h2>Create New Group</h2>
+        
+        <form class="create-form" (ngSubmit)="onCreateGroup()">
+          <div class="input-group">
+            <label for="groupName">Group Name *</label>
+            <input
+              id="groupName"
+              type="text"
+              [(ngModel)]="newGroupName"
+              name="groupName"
+              placeholder="Enter group name"
+              class="input-field"
+              [disabled]="isCreatingGroup"
+              (input)="clearMessages()"
+              required
+              minlength="3"
+            >
+          </div>
+
+          <div class="input-group">
+            <label for="groupDescription">Description (Optional)</label>
+            <textarea
+              id="groupDescription"
+              [(ngModel)]="newGroupDescription"
+              name="groupDescription"
+              placeholder="Describe your group..."
+              class="textarea-field"
+              [disabled]="isCreatingGroup"
+              (input)="clearMessages()"
+              rows="3"
+            ></textarea>
+            <small class="help-text">Note: Group descriptions are not stored in the database yet.</small>
+          </div>
+
+          <div class="button-group">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="isCreatingGroup || !isCreateFormValid()"
+            >
+              <span *ngIf="!isCreatingGroup">Create Group</span>
+              <span *ngIf="isCreatingGroup">Creating...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Join Group Tab -->
+    <div *ngIf="activeTab === 'join'" class="tab-content">
+      <div class="join-section">
+        <h2>Join Existing Group</h2>
+        
+        <div class="join-form">
+          <div class="input-group">
+            <label for="groupId">Group ID</label>
+            <input
+              id="groupId"
+              type="text"
+              [(ngModel)]="joinGroupId"
+              name="groupId"
+              placeholder="Enter the group ID you want to join"
+              class="input-field"
+              [disabled]="isJoiningGroup"
+              (input)="clearMessages()"
+            >
+            <small class="help-text">
+              Ask the group host for the Group ID. You can find your own group IDs in the "My Groups" tab.
+            </small>
+          </div>
+
+          <div class="button-group">
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="onJoinGroup(joinGroupId)"
+              [disabled]="isJoiningGroup || !joinGroupId.trim()"
+            >
+              <span *ngIf="!isJoiningGroup">Join Group</span>
+              <span *ngIf="isJoiningGroup">Joining...</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="join-help">
+          <h3>How to Join a Group</h3>
+          <ol>
+            <li>Get the Group ID from the group host</li>
+            <li>Enter the Group ID in the field above</li>
+            <li>Click "Join Group"</li>
+          </ol>
+          <p>Once you join, the group will appear in your "My Groups" tab.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <span>Loading...</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="groups-footer">
+      <a routerLink="/home" class="back-link">← Back to Home</a>
+      <a routerLink="/debug" class="debug-link">Debug Console</a>
+    </footer>
+  </div>
+</div>

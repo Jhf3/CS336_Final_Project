@@ -11,7 +11,7 @@ import { Navbar, NavButton } from '../../components/navbar/navbar';
 })
 export class HomeComponent {
   navigationButtons: NavButton[] = [
-    { label: 'Groups', route: '', disabled: true, style: 'primary' },
+    { label: 'Manage Groups', route: '/groups', style: 'primary' },
     { label: 'Campaign History', route: '/campaign-history', style: 'secondary' },
     { label: 'Debug', route: '/debug', style: 'secondary' }
   ];
