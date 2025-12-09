@@ -12,6 +12,13 @@
   margin-bottom: 32px;
   padding-bottom: 24px;
   border-bottom: 2px solid #e0e0e0;
+  position: relative;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
 }
 
 .header h1 {
@@ -40,6 +47,14 @@
   font-weight: 500;
   transition: all 0.3s ease;
   display: inline-block;
+  border: none;
+  cursor: pointer;
+  position: relative;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-primary {
@@ -47,7 +62,7 @@
   color: white;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background-color: #357abd;
 }
 
@@ -58,6 +73,23 @@
 
 .btn-secondary:hover {
   background-color: #5a6268;
+}
+
+.btn-auth {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-auth:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.coming-soon {
+  font-size: 0.75em;
+  font-style: italic;
+  display: block;
+  margin-top: 2px;
+  opacity: 0.9;
 }
 
 .main-content {
