@@ -16,6 +16,7 @@ import { Timestamp } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-debug',
+  standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './debug.component.html',
   styleUrl: './debug.component.css'
