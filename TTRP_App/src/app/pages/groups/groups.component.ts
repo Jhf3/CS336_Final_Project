@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { DatabaseService } from '../../services/database-service';
@@ -13,6 +13,7 @@ import { Group, User, CreateGroupRequest } from '../../../../types/types';
   styleUrl: './groups.component.css'
 })
 export class GroupsComponent implements OnInit {
+  private platformId = inject(PLATFORM_ID);
   currentUser: User | null = null;
   
   // Create group form
@@ -42,7 +43,11 @@ export class GroupsComponent implements OnInit {
   ) {}
   
   async ngOnInit() {
-    // Check if user is logged in
+    // Check if user is logged in (only in browser)
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    
     const storedUser = localStorage.getItem('currentUser');
     if (!storedUser) {
       this.router.navigate(['/login']);

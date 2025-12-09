@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, PLATFORM_ID, inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { DatabaseService } from '../../services/database-service';
@@ -13,6 +13,7 @@ import { User } from '../../../../types/types';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
+  private platformId = inject(PLATFORM_ID);
   username: string = '';
   isLoading: boolean = false;
   errorMessage: string = '';
@@ -44,8 +45,10 @@ export class LoginComponent {
         this.successMessage = `Welcome back, ${userResult.data.username}!`;
         
         // Store user info in localStorage for session management
-        localStorage.setItem('currentUser', JSON.stringify(userResult.data));
-        localStorage.setItem('isLoggedIn', 'true');
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem('currentUser', JSON.stringify(userResult.data));
+          localStorage.setItem('isLoggedIn', 'true');
+        }
         
         // Navigate to home or dashboard after successful login
         setTimeout(() => {
@@ -81,11 +84,13 @@ export class LoginComponent {
       });
       
       if (createResult.success && createResult.data) {
-        this.successMessage = `Account created successfully! Welcome, ${createResult.data.username}!`;
+        this.successMessage = `Account created! Welcome, ${createResult.data.username}!`;
         
         // Store user info in localStorage
-        localStorage.setItem('currentUser', JSON.stringify(createResult.data));
-        localStorage.setItem('isLoggedIn', 'true');
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.setItem('currentUser', JSON.stringify(createResult.data));
+          localStorage.setItem('isLoggedIn', 'true');
+        }
         
         // Navigate to home after successful account creation
         setTimeout(() => {
