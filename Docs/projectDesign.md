@@ -17,24 +17,34 @@ UI and Domain models in Docs on GitHub
     - List of notes left by the DM
 
 ## Components
-- Session card
+- **Navbar** (Reusable header component)
+    - Page title and subtitle
+    - Login/Register button (top-right)
+    - Configurable navigation buttons
+    - See `TTRP_App/src/app/components/navbar/README.md` for usage guide
+- **Session card**
     - date
-    - Avaialable players
-- Detailed Session card
+    - Available players
+    - Opens modal with detailed view on click
+- **Detailed Session card**
     - date
-    - Avaialable players
+    - Available players
     - snacks
     - carpool
     - (external availability)
     - notes (dm only)
-- Session list
-    - List select session cards/detailed cards
-- Note card
+    - Displays in modal popup (50vw width)
+- **Session list**
+    - Vertical scrollable list of session cards
+    - Custom scrollbar styling
+- **Note card**
     - session date
     - synopsis
-    - (maybe other things)
-- Secret Note card
-    - descriptive notes
+    - Blue accent styling
+- **Secret Note card**
+    - DM-only secret notes
+    - Dark theme with lock icon
+    - Brown/gold color scheme
 
 ## No SQL Structure
 - in no_sql.json
