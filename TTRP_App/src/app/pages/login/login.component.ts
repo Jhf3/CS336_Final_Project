@@ -49,7 +49,7 @@ export class LoginComponent {
         
         // Navigate to home or dashboard after successful login
         setTimeout(() => {
-          this.router.navigate(['/']);
+          this.router.navigate(['/home']);
         }, 1000);
         
       } else {
@@ -89,7 +89,7 @@ export class LoginComponent {
         
         // Navigate to home after successful account creation
         setTimeout(() => {
-          this.router.navigate(['/']);
+          this.router.navigate(['/home']);
         }, 1000);
         
       } else {

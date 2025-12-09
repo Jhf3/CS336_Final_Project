@@ -3,11 +3,14 @@ import { HomeComponent } from './pages/home/home.component';
 import { CampaignHistoryComponent } from './pages/campaign-history/campaign-history.component';
 import { DebugComponent } from './pages/debug/debug.component';
 import { LoginComponent } from './pages/login/login.component';
+import { GroupsComponent } from './pages/groups/groups.component';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: 'home', component: HomeComponent },
   { path: 'login', component: LoginComponent},
+  { path: 'groups', component: GroupsComponent },
   { path: 'campaign-history', component: CampaignHistoryComponent },
   { path: 'debug', component: DebugComponent },
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: '/login' }
 ];

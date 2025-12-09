@@ -57,9 +57,9 @@
           class="btn btn-secondary"
           (click)="onCreateAccount()"
           [disabled]="isLoading || !isFormValid()"
-          *ngIf="errorMessage && errorMessage.includes('not found')"
         >
-          Create Account
+          <span *ngIf="!isLoading">Create New Account</span>
+          <span *ngIf="isLoading">Creating Account...</span>
         </button>
       </div>
     </form>
