@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SessionListComponent, SessionData } from '../components/session-list/session-list.component';
+import { SessionListComponent, SessionData } from '../../components/session-list/session-list.component';
 import { RouterLink } from '@angular/router';
 
 @Component({

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { DatabaseService } from '../services/database-service';
+import { DatabaseService } from '../../services/database-service';
 import { 
   User, 
   Group, 
@@ -10,7 +10,7 @@ import {
   CreateUserRequest, 
   CreateGroupRequest, 
   CreateSessionRequest, 
-} from '../../../types/types';
+} from '../../../../types/types';
 import { Timestamp } from '@angular/fire/firestore';
 
 
