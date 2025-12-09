@@ -1,0 +1,72 @@
+<div class="login-container">
+  <div class="login-card">
+    <header class="login-header">
+      <h1>Welcome to TTRP App</h1>
+      <p>Enter your username to get started</p>
+    </header>
+
+    <form class="login-form" (ngSubmit)="onLogin()" #loginForm="ngForm">
+      <div class="input-group">
+        <label for="username">Username</label>
+        <input
+          id="username"
+          type="text"
+          [(ngModel)]="username"
+          (input)="onUsernameChange()"
+          name="username"
+          placeholder="Enter your username"
+          class="username-input"
+          [class.error]="errorMessage"
+          [disabled]="isLoading"
+          required
+          minlength="3"
+        >
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="message error-message">
+        <span class="message-icon">⚠️</span>
+        {{ errorMessage }}
+      </div>
+
+      <!-- Success Message -->
+      <div *ngIf="successMessage" class="message success-message">
+        <span class="message-icon">✅</span>
+        {{ successMessage }}
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <span>Checking username...</span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="button-group">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isLoading || !username || username.trim().length < 3"
+        >
+          <span *ngIf="!isLoading">Login</span>
+          <span *ngIf="isLoading">Logging in...</span>
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="onCreateAccount()"
+          [disabled]="isLoading || !username || username.trim().length < 3"
+          *ngIf="errorMessage && errorMessage.includes('not found')"
+        >
+          Create Account
+        </button>
+      </div>
+    </form>
+
+    <footer class="login-footer">
+      <a routerLink="/" class="back-link">← Back to Home</a>
+      <a routerLink="/debug" class="debug-link">Debug Console</a>
+    </footer>
+  </div>
+</div>
