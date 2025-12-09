@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { DatabaseService } from '../../services/database-service';
 import { 
   User, 
@@ -12,16 +11,19 @@ import {
   CreateSessionRequest, 
 } from '../../../../types/types';
 import { Timestamp } from '@angular/fire/firestore';
+import { Navbar, NavButton } from '../../components/navbar/navbar';
 
 
 @Component({
   selector: 'app-debug',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, Navbar],
   templateUrl: './debug.component.html',
   styleUrl: './debug.component.css'
 })
 export class DebugComponent implements OnInit {
+  navigationButtons: NavButton[] = [
+    { label: '← Back to Home', route: '/', style: 'secondary' }
+  ];
   // Test data
   testUsername = 'test_user_' + Date.now();
   testGroupName = 'Test RPG Group';

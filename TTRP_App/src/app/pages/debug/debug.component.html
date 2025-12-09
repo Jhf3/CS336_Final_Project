@@ -1,11 +1,13 @@
 <div class="debug-container">
-  <header class="debug-header">
-    <h1>🛠️ Database Service Debug Console</h1>
-    <div class="nav-controls">
-      <a routerLink="/" class="btn btn-secondary">← Back to Home</a>
-      <button (click)="clearResults()" class="btn btn-warning">Clear Results</button>
-    </div>
-  </header>
+  <app-navbar 
+    title="🛠️ Database Service Debug Console" 
+    subtitle=""
+    [navigationButtons]="navigationButtons">
+  </app-navbar>
+  
+  <div class="debug-extra-controls">
+    <button (click)="clearResults()" class="btn btn-warning">Clear Results</button>
+  </div>
 
   <div class="debug-content">
     <!-- Test Controls Section -->

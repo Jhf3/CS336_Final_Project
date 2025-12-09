@@ -1,0 +1,25 @@
+<div class="campaign-history-container">
+    <app-navbar 
+        title="Campaign History" 
+        subtitle="All previous sessions and campaign progress"
+        [navigationButtons]="navigationButtons">
+    </app-navbar>
+
+    <main class="main-content">
+        <section class="history-section">
+            <app-session-list [sessions]="pastSessions"></app-session-list>
+        </section>
+
+        <section class="dm-notes-section">
+            <h2>DM Campaign Notes</h2>
+            <div class="notes-placeholder">
+                <p>Campaign timeline and routing notes will appear here</p>
+                <p class="hint">(Coming soon)</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 TTRP App - CS336 Final Project</p>
+    </footer>
+</div>
