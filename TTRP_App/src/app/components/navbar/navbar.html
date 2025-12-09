@@ -1,0 +1,26 @@
+<header class="header">
+  <div class="top-nav">
+    <button class="btn btn-auth" disabled>
+      🔐 Login / Register
+      <span class="coming-soon">(Coming Soon)</span>
+    </button>
+  </div>
+  
+  <h1>{{ title }}</h1>
+  <p class="subtitle">{{ subtitle }}</p>
+  
+  <div class="header-actions">
+    @for (navBtn of navigationButtons; track navBtn.route) {
+      @if (navBtn.disabled) {
+        <button class="btn" [ngClass]="'btn-' + (navBtn.style || 'primary')" disabled>
+          {{ navBtn.label }}
+          <span class="coming-soon">(Coming Soon)</span>
+        </button>
+      } @else {
+        <a [routerLink]="navBtn.route" class="btn" [ngClass]="'btn-' + (navBtn.style || 'primary')">
+          {{ navBtn.label }}
+        </a>
+      }
+    }
+  </div>
+</header>

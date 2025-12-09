@@ -1,19 +1,9 @@
 <div class="campaign-history-container">
-    <header class="header">
-        <div class="top-nav">
-            <button class="btn btn-auth" disabled>
-                🔐 Login / Register
-                <span class="coming-soon">(Coming Soon)</span>
-            </button>
-        </div>
-        <h1>Campaign History</h1>
-        <p class="subtitle">All previous sessions and campaign progress</p>
-        <div class="header-actions">
-            <a routerLink="/" class="btn btn-primary">
-                Upcoming Sessions
-            </a>
-        </div>
-    </header>
+    <app-navbar 
+        title="Campaign History" 
+        subtitle="All previous sessions and campaign progress"
+        [navigationButtons]="navigationButtons">
+    </app-navbar>
 
     <main class="main-content">
         <section class="history-section">

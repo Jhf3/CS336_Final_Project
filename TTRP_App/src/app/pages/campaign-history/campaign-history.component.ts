@@ -1,15 +1,19 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { SessionListComponent, SessionData } from '../../components/session-list/session-list.component';
+import { Navbar, NavButton } from '../../components/navbar/navbar';
 
 @Component({
   selector: 'app-campaign-history',
-  imports: [CommonModule, RouterLink, SessionListComponent],
+  imports: [CommonModule, SessionListComponent, Navbar],
   templateUrl: './campaign-history.component.html',
   styleUrl: './campaign-history.component.css'
 })
 export class CampaignHistoryComponent {
+  navigationButtons: NavButton[] = [
+    { label: 'Upcoming Sessions', route: '/', style: 'primary' }
+  ];
+
   // Previous sessions
   pastSessions: SessionData[] = [
     {

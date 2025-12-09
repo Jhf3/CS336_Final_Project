@@ -1,28 +1,9 @@
 <div class="home-container">
-  <header class="header">
-    <div class="top-nav">
-      <button class="btn btn-auth" disabled>
-        🔐 Login / Register
-        <span class="coming-soon">(Coming Soon)</span>
-      </button>
-    </div>
-    
-    <h1>Upcoming Sessions</h1>
-    <p class="subtitle">Possible sessions for the next 1-2 weeks</p>
-    
-    <div class="header-actions">
-      <button class="btn btn-primary" disabled>
-        Groups
-        <span class="coming-soon">(Coming Soon)</span>
-      </button>
-      <a routerLink="/campaign-history" class="btn btn-secondary">
-        Campaign History
-      </a>
-      <a routerLink="/debug" class="btn btn-secondary">
-        Debug
-      </a>
-    </div>
-  </header>
+  <app-navbar 
+    title="Upcoming Sessions" 
+    subtitle="Possible sessions for the next 1-2 weeks"
+    [navigationButtons]="navigationButtons">
+  </app-navbar>
 
   <main class="main-content">
     <app-session-list [sessions]="upcomingSessions"></app-session-list>
