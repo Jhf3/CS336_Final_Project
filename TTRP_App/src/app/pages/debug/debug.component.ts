@@ -197,6 +197,150 @@ export class DebugComponent implements OnInit {
     this.addMessage('✅ Complete flow test finished!');
   }
   
+  async populateSampleData() {
+    this.loading = true;
+    this.addMessage('🌱 Starting sample data population...');
+    
+    try {
+      // Create sample users
+      const sampleUsers = [
+        { username: 'john_doe' },
+        { username: 'jane_smith' },
+        { username: 'mike_wizard' },
+        { username: 'sarah_rogue' },
+        { username: 'alex_fighter' }
+      ];
+      
+      const createdUsers: User[] = [];
+      
+      for (const userData of sampleUsers) {
+        try {
+          const result = await this.dbService.createUser(userData);
+          if (result.success && result.data) {
+            createdUsers.push(result.data);
+            this.addMessage(`✅ Created user: ${result.data.username}`);
+          } else {
+            // User might already exist, try to get them
+            const existingResult = await this.dbService.getUserByUsername(userData.username);
+            if (existingResult.success && existingResult.data) {
+              createdUsers.push(existingResult.data);
+              this.addMessage(`🔄 Found existing user: ${existingResult.data.username}`);
+            }
+          }
+        } catch (error) {
+          this.addMessage(`⚠️ Error with user ${userData.username}: ${error}`);
+        }
+      }
+      
+      if (createdUsers.length === 0) {
+        this.addMessage('❌ No users available for group creation');
+        return;
+      }
+      
+      // Create sample groups
+      const sampleGroups = [
+        {
+          name: 'Weekly D&D Campaign',
+          hostId: createdUsers[0].id,
+          description: 'Epic fantasy adventure every Friday night'
+        },
+        {
+          name: 'Pathfinder Society',
+          hostId: createdUsers[1].id,
+          description: 'Organized play sessions'
+        },
+        {
+          name: 'Call of Cthulhu Mystery',
+          hostId: createdUsers[2].id,
+          description: 'Horror investigation campaign'
+        }
+      ];
+      
+      const createdGroups: Group[] = [];
+      
+      for (let i = 0; i < sampleGroups.length; i++) {
+        const groupData = sampleGroups[i];
+        try {
+          const groupRequest: CreateGroupRequest = {
+            name: groupData.name,
+            hostId: groupData.hostId
+          };
+          
+          const result = await this.dbService.createGroup(groupRequest);
+          if (result.success && result.data) {
+            createdGroups.push(result.data);
+            this.addMessage(`✅ Created group: ${result.data.name}`);
+            
+            // Add some members to each group
+            const membersToAdd = createdUsers.slice(1, Math.min(4, createdUsers.length));
+            for (const member of membersToAdd) {
+              if (member.id !== groupData.hostId) {
+                try {
+                  await this.dbService.joinGroup({
+                    groupId: result.data.id,
+                    userId: member.id
+                  });
+                  this.addMessage(`✅ Added ${member.username} to ${result.data.name}`);
+                } catch (error) {
+                  this.addMessage(`⚠️ Failed to add ${member.username} to group`);
+                }
+              }
+            }
+          }
+        } catch (error) {
+          this.addMessage(`⚠️ Error creating group ${groupData.name}: ${error}`);
+        }
+      }
+      
+      // Create sample sessions
+      if (createdGroups.length > 0) {
+        const sessionDates = [
+          new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
+          new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
+          new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 2 weeks from now
+          new Date(Date.now() + 21 * 24 * 60 * 60 * 1000), // 3 weeks from now
+        ];
+        
+        const sessionNotes = [
+          'Character creation and campaign introduction. Bring dice and character sheets!',
+          'Continue exploring the haunted castle. Remember to bring your spell components.',
+          'Major boss fight scheduled! Make sure characters are leveled up.',
+          'City intrigue arc begins. Perfect for roleplay-focused players.'
+        ];
+        
+        for (let i = 0; i < Math.min(createdGroups.length, sessionDates.length); i++) {
+          const group = createdGroups[i];
+          const sessionDate = sessionDates[i];
+          const notes = sessionNotes[i];
+          
+          try {
+            const sessionRequest: CreateSessionRequest = {
+              groupId: group.id,
+              sessionDate: Timestamp.fromDate(sessionDate),
+              hostNotes: notes,
+              isConfirmed: i < 2 // First 2 sessions are confirmed
+            };
+            
+            const result = await this.dbService.createSession(sessionRequest);
+            if (result.success && result.data) {
+              this.addMessage(`✅ Created session for ${group.name} on ${sessionDate.toLocaleDateString()}`);
+            }
+          } catch (error) {
+            this.addMessage(`⚠️ Error creating session for ${group.name}: ${error}`);
+          }
+        }
+      }
+      
+      this.addMessage('🎉 Sample data population completed!');
+      this.addMessage(`📊 Summary: ${createdUsers.length} users, ${createdGroups.length} groups, ${Math.min(createdGroups.length, 4)} sessions`);
+      
+    } catch (error) {
+      this.addMessage(`❌ Error during sample data population: ${error}`);
+    } finally {
+      this.loading = false;
+    }
+  }
+
   clearResults() {
     this.currentUser = null;
     this.currentGroup = null;
