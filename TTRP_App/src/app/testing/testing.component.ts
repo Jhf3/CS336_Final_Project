@@ -1,13 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SessionListComponent, SessionData } from '../components/session-list/session-list.component';
-import { NoteCardComponent } from '../components/note-card/note-card.component';
-import { SecretNoteCardComponent } from '../components/secret-note-card/secret-note-card.component';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-testing',
-  imports: [CommonModule, SessionListComponent, NoteCardComponent, SecretNoteCardComponent, RouterLink],
+  imports: [CommonModule, SessionListComponent, RouterLink],
   templateUrl: './testing.component.html',
   styleUrl: './testing.component.css'
 })
