@@ -198,6 +198,33 @@ export class DebugComponent implements OnInit {
   }
   
   async populateSampleData() {
+    /* 
+     * SAMPLE DATA OVERVIEW:
+     * This function populates the Firebase database with realistic sample data for testing.
+     * 
+     * USERS (5 total):
+     * - john_doe, jane_smith, mike_wizard, sarah_rogue, alex_fighter
+     * - Each user gets auto-generated ID, username, creation timestamp, and empty groupIds array
+     * 
+     * GROUPS (3 total):
+     * - "Weekly D&D Campaign" (hosted by john_doe) - Fantasy RPG with 3-4 members
+     * - "Pathfinder Society" (hosted by jane_smith) - Organized play with 3-4 members  
+     * - "Call of Cthulhu Mystery" (hosted by mike_wizard) - Horror investigation with 3-4 members
+     * - Each group gets host, members, creation/update timestamps, and denormalized host name
+     * 
+     * SESSIONS (4 total):
+     * - Spread across next 3 weeks with realistic dates
+     * - Session 1: Character creation (3 days from now, confirmed)
+     * - Session 2: Castle exploration (1 week from now, confirmed) 
+     * - Session 3: Boss fight (2 weeks from now, unconfirmed)
+     * - Session 4: City intrigue (3 weeks from now, unconfirmed)
+     * - Each session includes group reference, host info, notes, and confirmation status
+     * 
+     * RELATIONSHIPS:
+     * - Users are automatically added to multiple groups as members
+     * - Groups maintain memberIds arrays and hosts can't leave their own groups
+     * - Sessions reference their parent groups and include denormalized data for performance
+     */
     this.loading = true;
     this.addMessage('🌱 Starting sample data population...');
     
