@@ -28,7 +28,7 @@
       <div class="error-card">
         <h3>⚠️ Error Loading Sessions</h3>
         <p>{{ errorMessage }}</p>
-        <button (click)="setupSessionsStream()" class="btn btn-secondary">
+        <button (click)="retryLoadingSessions()" class="btn btn-secondary">
           Retry
         </button>
       </div>

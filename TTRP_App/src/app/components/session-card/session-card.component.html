@@ -1,17 +1,14 @@
 <div class="session-card" (click)="openModal()">
   <div class="session-date">
-    <h3>{{ date | date: 'fullDate' }}</h3>
+    <h3>{{ sessionDate | date: 'fullDate' }}</h3>
+    <p class="session-status" [class.confirmed]="session.isConfirmed">{{ session.isConfirmed ? 'Confirmed' : 'Tentative' }}</p>
   </div>
   <div class="players-section">
-    <h4>Available Players</h4>
-    <ul class="player-list">
-      @for (player of availablePlayers; track player) {
-        <li>{{ player }}</li>
-      }
-      @empty {
-        <li class="no-players">No players available</li>
-      }
-    </ul>
+    <h4>Available Players ({{ session.availableUsers.length }})</h4>
+    <div class="session-info">
+      <p><strong>Host:</strong> {{ session.hostName }}</p>
+      <p><strong>Group:</strong> {{ session.groupName }}</p>
+    </div>
   </div>
   <div class="click-hint">Click for details</div>
 </div>
@@ -21,8 +18,7 @@
     <div class="modal-content" (click)="$event.stopPropagation()">
       <button class="close-button" (click)="closeModal()">✕</button>
       <app-detailed-session-card
-        [date]="date"
-        [availablePlayers]="availablePlayers"
+        [session]="session"
         [snacks]="detailedSnacks"
         [carpool]="detailedCarpool"
         [externalAvailability]="detailedExternalAvailability"

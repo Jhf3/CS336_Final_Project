@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NoteCardComponent } from '../note-card/note-card.component';
 import { SecretNoteCardComponent } from '../secret-note-card/secret-note-card.component';
+import { Session } from '../../../../types/types';
 
 @Component({
   selector: 'app-detailed-session-card',
@@ -10,12 +11,19 @@ import { SecretNoteCardComponent } from '../secret-note-card/secret-note-card.co
   styleUrl: './detailed-session-card.component.css'
 })
 export class DetailedSessionCardComponent {
-  @Input() date!: Date;
-  @Input() availablePlayers: string[] = [];
+  @Input() session!: Session;
   @Input() snacks: string = '';
   @Input() carpool: string = '';
   @Input() externalAvailability: string = '';
   @Input() sessionSynopsis: string = '';
   @Input() secretNotes: string = '';
   @Input() isDM: boolean = false;
+
+  get sessionDate(): Date {
+    return this.session.sessionDate.toDate();
+  }
+
+  get availablePlayers(): string[] {
+    return this.session.availableUsers || [];
+  }
 }

@@ -27,6 +27,32 @@
   font-size: 1.2em;
 }
 
+.session-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75em;
+  font-weight: 500;
+  margin-top: 4px;
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.session-status.confirmed {
+  background-color: #28a745;
+  color: white;
+}
+
+.session-info {
+  margin-top: 8px;
+}
+
+.session-info p {
+  margin: 2px 0;
+  font-size: 0.9em;
+  color: #666;
+}
+
 .players-section h4 {
   margin: 0 0 8px 0;
   color: #555;

@@ -1,19 +1,20 @@
 <div class="detailed-session-card">
   <div class="session-header">
-    <h2>{{ date | date: 'fullDate' }}</h2>
+    <h2>{{ sessionDate | date: 'fullDate' }}</h2>
+    <p class="session-info">
+      <strong>{{ session.groupName }}</strong> hosted by {{ session.hostName }}
+    </p>
+    <p class="session-status" [class.confirmed]="session.isConfirmed">
+      {{ session.isConfirmed ? 'Confirmed' : 'Tentative' }}
+    </p>
   </div>
 
   <div class="session-details">
     <div class="detail-section">
-      <h3>Available Players</h3>
-      <ul class="player-list">
-        @for (player of availablePlayers; track player) {
-          <li>{{ player }}</li>
-        }
-        @empty {
-          <li class="no-data">No players available</li>
-        }
-      </ul>
+      <h3>Available Players ({{ availablePlayers.length }})</h3>
+      <div class="player-count">
+        <p>{{ availablePlayers.length }} players confirmed</p>
+      </div>
     </div>
 
     <div class="detail-section">
@@ -36,7 +37,7 @@
     @if (sessionSynopsis) {
       <div class="notes-section">
         <app-note-card 
-          [sessionDate]="date"
+          [sessionDate]="sessionDate"
           [synopsis]="sessionSynopsis">
         </app-note-card>
       </div>

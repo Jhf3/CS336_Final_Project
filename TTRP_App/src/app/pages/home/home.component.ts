@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
-import { SessionListComponent, SessionData } from '../../components/session-list/session-list.component';
+import { SessionListComponent } from '../../components/session-list/session-list.component';
 import { Navbar, NavButton } from '../../components/navbar/navbar';
 import { DatabaseService } from '../../services/database-service';
 import { Group, User, Session } from '../../../../types/types';
@@ -28,7 +28,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   selectedGroup: Group | null = null;
   
   // Sessions data
-  upcomingSessions: SessionData[] = [];
+  upcomingSessions: Session[] = [];
   isLoadingSessions: boolean = true;
   errorMessage: string = '';
   
@@ -94,13 +94,15 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.sessionsSubscription = this.dbService.getGroupSessionsStream(this.selectedGroup.id)
       .subscribe({
         next: (sessions: Session[]) => {
-          this.upcomingSessions = this.convertSessionsToSessionData(sessions);
+          console.log('Sessions loaded successfully:', sessions);
+          this.upcomingSessions = this.filterUpcomingSessions(sessions);
           this.isLoadingSessions = false;
+          this.errorMessage = ''; // Clear any previous error message
           this.cdr.detectChanges(); // Force change detection after data update
         },
         error: (error) => {
           console.error('Error loading sessions stream:', error);
-          this.errorMessage = 'Failed to load sessions';
+          this.errorMessage = 'Failed to load sessions. Please check your connection and try again.';
           this.isLoadingSessions = false;
           this.upcomingSessions = [];
           this.cdr.detectChanges(); // Force change detection on error
@@ -108,31 +110,31 @@ export class HomeComponent implements OnInit, OnDestroy {
       });
   }
   
-  private convertSessionsToSessionData(sessions: Session[]): SessionData[] {
-    // Filter for upcoming sessions (future dates only)
-    const now = new Date();
-    const upcomingSessions = sessions.filter(session => 
-      session.sessionDate.toDate() >= now
-    );
-    
-    // Convert Session objects to SessionData format
-    return upcomingSessions.map(session => ({
-      date: session.sessionDate.toDate(),
-      availablePlayers: this.generatePlayerList(session)
-    }));
+  private filterUpcomingSessions(sessions: Session[]): Session[] {
+    try {
+      // Filter for upcoming sessions (future dates only)
+      const now = new Date();
+      return sessions.filter(session => {
+        // Defensive check for sessionDate
+        if (!session || !session.sessionDate) {
+          console.warn('Session missing sessionDate:', session);
+          return false;
+        }
+        
+        try {
+          return session.sessionDate.toDate() >= now;
+        } catch (error) {
+          console.error('Error converting sessionDate:', error, session);
+          return false;
+        }
+      });
+    } catch (error) {
+      console.error('Error filtering sessions:', error);
+      return [];
+    }
   }
   
-  private generatePlayerList(session: Session): string[] {
-    // For now, generate a placeholder list of players
-    // In a real app, you might fetch group members or session participants
-    if (!this.selectedGroup) return [];
-    
-    const memberCount = this.selectedGroup.memberIds.length;
-    const playerNames = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank', 'Grace'];
-    
-    // Return a subset of player names based on group size
-    return playerNames.slice(0, Math.min(memberCount, playerNames.length));
-  }
+
   
   getSelectedGroupName(): string {
     return this.selectedGroup ? this.selectedGroup.name : 'No Group Selected';
@@ -140,5 +142,20 @@ export class HomeComponent implements OnInit, OnDestroy {
   
   hasSelectedGroup(): boolean {
     return this.selectedGroup !== null;
+  }
+  
+  /**
+   * Public method to retry loading sessions - can be called from template
+   */
+  retryLoadingSessions() {
+    if (this.selectedGroup) {
+      // Unsubscribe from existing stream if any
+      if (this.sessionsSubscription) {
+        this.sessionsSubscription.unsubscribe();
+      }
+      
+      this.errorMessage = '';
+      this.setupSessionsStream();
+    }
   }
 }

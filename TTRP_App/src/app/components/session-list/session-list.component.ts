@@ -1,11 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SessionCardComponent } from '../session-card/session-card.component';
-
-export interface SessionData {
-  date: Date;
-  availablePlayers: string[];
-}
+import { Session } from '../../../../types/types';
 
 @Component({
   selector: 'app-session-list',
@@ -14,5 +10,5 @@ export interface SessionData {
   styleUrl: './session-list.component.css'
 })
 export class SessionListComponent {
-  @Input() sessions: SessionData[] = [];
+  @Input() sessions: Session[] = [];
 }
