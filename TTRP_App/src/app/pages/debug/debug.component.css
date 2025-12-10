@@ -188,6 +188,23 @@ th {
   color: white;
 }
 
+.count-cell {
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.count-badge {
+  display: inline-block;
+  padding: 0.2rem 0.4rem;
+  background-color: #007bff;
+  color: white;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
 /* Messages Panel */
 .messages-panel {
   grid-column: 1 / -1;
