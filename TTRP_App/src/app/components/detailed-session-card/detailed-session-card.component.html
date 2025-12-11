@@ -15,39 +15,295 @@
       <div class="player-count">
         <p>{{ availablePlayers.length }} players confirmed</p>
       </div>
+      
+      @if (currentUser && isFutureSession) {
+        <div class="player-actions">
+          @if (!isPlayerAvailable) {
+            <button 
+              class="btn btn-join" 
+              (click)="addPlayerToSession()" 
+              [disabled]="isProcessing">
+              {{ isProcessing ? 'Joining...' : 'Join Session' }}
+            </button>
+          } @else {
+            <button 
+              class="btn btn-leave" 
+              (click)="removePlayerFromSession()" 
+              [disabled]="isProcessing">
+              {{ isProcessing ? 'Leaving...' : 'Leave Session' }}
+            </button>
+          }
+        </div>
+      }
     </div>
 
     <div class="detail-section">
       <h3>Snacks</h3>
       <p class="detail-content">{{ snacks || 'No snack information' }}</p>
+      
+      @if (currentUser && isFutureSession) {
+        @if (hasUserSnack) {
+          <div class="action-group">
+            <button 
+              class="btn btn-remove" 
+              (click)="removeSnackInfo()" 
+              [disabled]="isProcessing">
+              {{ isProcessing ? 'Removing...' : 'Remove My Snack' }}
+            </button>
+          </div>
+        } @else {
+          <div class="input-group">
+            <input 
+              type="text" 
+              [(ngModel)]="snackInput" 
+              placeholder="What will you bring? (e.g., chips, cookies, etc.)"
+              class="text-input"
+              [disabled]="isProcessing">
+            <button 
+              class="btn btn-add" 
+              (click)="addSnackInfo()" 
+              [disabled]="isProcessing || !snackInput.trim()">
+              {{ isProcessing ? 'Adding...' : 'Add Snack' }}
+            </button>
+          </div>
+        }
+      }
     </div>
 
     <div class="detail-section">
       <h3>Carpool</h3>
-      <p class="detail-content">{{ carpool || 'No carpool information' }}</p>
+      
+      <!-- Display current carpools -->
+      @if (session.carpool && session.carpool.length > 0) {
+        <div class="carpool-list">
+          @for (car of session.carpool; track car.driverId) {
+            <div class="carpool-item">
+              <div class="carpool-header">
+                <strong>🚗 {{ car.driverName }}</strong>
+                <span class="carpool-capacity">{{ car.passengers.length }}/{{ car.capacity }} seats</span>
+              </div>
+              @if (car.passengers.length > 0) {
+                <div class="carpool-passengers">
+                  <small>Passengers: {{ getPassengerNames(car) }}</small>
+                </div>
+              }
+              
+              <!-- Actions for this carpool -->
+              @if (currentUser && isFutureSession) {
+                @if (car.driverId === currentUser.id) {
+                  <!-- Driver's own carpool -->
+                  <div class="carpool-actions">
+                    <button 
+                      class="btn btn-small btn-remove" 
+                      (click)="removeCarpoolInfo()" 
+                      [disabled]="isProcessing">
+                      {{ isProcessing ? 'Removing...' : 'Cancel Ride Offer' }}
+                    </button>
+                  </div>
+                } @else if (isCurrentUserPassengerInCarpool(car)) {
+                  <!-- User is a passenger in this carpool -->
+                  <div class="carpool-actions">
+                    <button 
+                      class="btn btn-small btn-remove" 
+                      (click)="leavePassengerCarpool()" 
+                      [disabled]="isProcessing">
+                      {{ isProcessing ? 'Leaving...' : 'Leave This Ride' }}
+                    </button>
+                  </div>
+                } @else if (car.passengers.length < car.capacity && !isUserPassenger && !userCarpoolHasPassengers) {
+                  <!-- Available carpool to join -->
+                  <div class="carpool-actions">
+                    <button 
+                      class="btn btn-small btn-join-carpool" 
+                      (click)="joinCarpoolAsPassenger(car.driverId, car.driverName)" 
+                      [disabled]="isProcessing">
+                      {{ isProcessing ? 'Joining...' : 'Join This Ride' }}
+                    </button>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="detail-content">No carpool arrangements yet</p>
+      }
+      
+      <!-- Offer ride section -->
+      @if (currentUser && isFutureSession) {
+        @if (userCarpoolHasPassengers) {
+          <div class="info-message">
+            <p>ℹ️ You cannot join another ride while you have passengers. Please cancel your ride offer first or ask your passengers to leave.</p>
+          </div>
+        }
+        
+        @if (!hasUserCarpool && !isUserPassenger) {
+          <div class="carpool-offer-section">
+            <h4>Offer a Ride</h4>
+            <div class="input-group">
+              <input 
+                type="number" 
+                [(ngModel)]="carpoolCapacity" 
+                min="1"
+                max="10"
+                placeholder="Capacity"
+                class="text-input capacity-input"
+                [disabled]="isProcessing">
+              <button 
+                class="btn btn-add" 
+                (click)="addCarpoolInfo()" 
+                [disabled]="isProcessing">
+                {{ isProcessing ? 'Offering...' : 'Offer Ride' }}
+              </button>
+            </div>
+            <small class="help-text">Enter the number of passengers you can take (1-10)</small>
+          </div>
+        }
+      }
     </div>
 
-    @if (externalAvailability) {
+    @if (externalAvailability || (isHost && isFutureSession)) {
       <div class="detail-section">
         <h3>External Availability</h3>
-        <p class="detail-content">{{ externalAvailability }}</p>
+        
+        @if (!isEditingExternalAvailability) {
+          <p class="detail-content">{{ externalAvailability || 'No external availability information' }}</p>
+          
+          @if (isHost && isFutureSession) {
+            <div class="action-group">
+              <button 
+                class="btn btn-edit" 
+                (click)="startEditingExternalAvailability()" 
+                [disabled]="isProcessing">
+                Edit External Availability
+              </button>
+            </div>
+          }
+        } @else {
+          <div class="edit-group">
+            <textarea 
+              [(ngModel)]="externalAvailabilityInput" 
+              placeholder="Enter external availability info (e.g., Game store reserved until 10 PM)"
+              class="text-area"
+              rows="3"
+              [disabled]="isProcessing">
+            </textarea>
+            <div class="button-group">
+              <button 
+                class="btn btn-save" 
+                (click)="saveExternalAvailability()" 
+                [disabled]="isProcessing">
+                {{ isProcessing ? 'Saving...' : 'Save' }}
+              </button>
+              <button 
+                class="btn btn-cancel" 
+                (click)="cancelEditingExternalAvailability()" 
+                [disabled]="isProcessing">
+                Cancel
+              </button>
+            </div>
+          </div>
+        }
       </div>
     }
 
-    @if (sessionSynopsis) {
+    @if (sessionSynopsis || (isHost && isFutureSession)) {
       <div class="notes-section">
-        <app-note-card 
-          [sessionDate]="sessionDate"
-          [synopsis]="sessionSynopsis">
-        </app-note-card>
+        @if (!isEditingHostNotes) {
+          <app-note-card 
+            [sessionDate]="sessionDate"
+            [synopsis]="sessionSynopsis">
+          </app-note-card>
+          
+          @if (isHost && isFutureSession) {
+            <div class="action-group" style="margin-top: 8px;">
+              <button 
+                class="btn btn-edit" 
+                (click)="startEditingHostNotes()" 
+                [disabled]="isProcessing">
+                Edit Session Notes
+              </button>
+            </div>
+          }
+        } @else {
+          <div class="detail-section edit-group">
+            <h3>Edit Session Notes</h3>
+            <textarea 
+              [(ngModel)]="hostNotesInput" 
+              placeholder="Enter session notes/synopsis"
+              class="text-area"
+              rows="6"
+              [disabled]="isProcessing">
+            </textarea>
+            <div class="button-group">
+              <button 
+                class="btn btn-save" 
+                (click)="saveHostNotes()" 
+                [disabled]="isProcessing">
+                {{ isProcessing ? 'Saving...' : 'Save' }}
+              </button>
+              <button 
+                class="btn btn-cancel" 
+                (click)="cancelEditingHostNotes()" 
+                [disabled]="isProcessing">
+                Cancel
+              </button>
+            </div>
+          </div>
+        }
       </div>
     }
 
-    @if (isDM && secretNotes) {
+    @if ((isDM && secretNotes) || (isHost && isFutureSession)) {
       <div class="notes-section">
-        <app-secret-note-card 
-          [descriptiveNotes]="secretNotes">
-        </app-secret-note-card>
+        @if (!isEditingSecretNotes) {
+          @if (secretNotes) {
+            <app-secret-note-card 
+              [descriptiveNotes]="secretNotes">
+            </app-secret-note-card>
+          } @else if (isHost) {
+            <div class="detail-section">
+              <h3>Secret Notes (DM Only)</h3>
+              <p class="detail-content">No secret notes yet</p>
+            </div>
+          }
+          
+          @if (isHost && isFutureSession) {
+            <div class="action-group" style="margin-top: 8px;">
+              <button 
+                class="btn btn-edit" 
+                (click)="startEditingSecretNotes()" 
+                [disabled]="isProcessing">
+                Edit Secret Notes
+              </button>
+            </div>
+          }
+        } @else {
+          <div class="detail-section edit-group">
+            <h3>Edit Secret Notes (DM Only)</h3>
+            <textarea 
+              [(ngModel)]="secretNotesInput" 
+              placeholder="Enter secret DM notes"
+              class="text-area"
+              rows="8"
+              [disabled]="isProcessing">
+            </textarea>
+            <div class="button-group">
+              <button 
+                class="btn btn-save" 
+                (click)="saveSecretNotes()" 
+                [disabled]="isProcessing">
+                {{ isProcessing ? 'Saving...' : 'Save' }}
+              </button>
+              <button 
+                class="btn btn-cancel" 
+                (click)="cancelEditingSecretNotes()" 
+                [disabled]="isProcessing">
+                Cancel
+              </button>
+            </div>
+          </div>
+        }
       </div>
     }
   </div>
