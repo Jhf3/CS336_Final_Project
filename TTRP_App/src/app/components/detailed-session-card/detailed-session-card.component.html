@@ -110,7 +110,7 @@
                       {{ isProcessing ? 'Leaving...' : 'Leave This Ride' }}
                     </button>
                   </div>
-                } @else if (car.passengers.length < car.capacity && !isUserPassenger) {
+                } @else if (car.passengers.length < car.capacity && !isUserPassenger && !userCarpoolHasPassengers) {
                   <!-- Available carpool to join -->
                   <div class="carpool-actions">
                     <button 
@@ -131,6 +131,12 @@
       
       <!-- Offer ride section -->
       @if (currentUser && isFutureSession) {
+        @if (userCarpoolHasPassengers) {
+          <div class="info-message">
+            <p>ℹ️ You cannot join another ride while you have passengers. Please cancel your ride offer first or ask your passengers to leave.</p>
+          </div>
+        }
+        
         @if (!hasUserCarpool && !isUserPassenger) {
           <div class="carpool-offer-section">
             <h4>Offer a Ride</h4>

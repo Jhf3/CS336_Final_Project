@@ -67,6 +67,12 @@ export class DetailedSessionCardComponent {
     return this.session.carpool.some(car => car.driverId === this.currentUser!.id);
   }
 
+  get userCarpoolHasPassengers(): boolean {
+    if (!this.currentUser) return false;
+    const userCarpool = this.session.carpool.find(car => car.driverId === this.currentUser!.id);
+    return userCarpool ? userCarpool.passengers.length > 0 : false;
+  }
+
   get isUserPassenger(): boolean {
     if (!this.currentUser) return false;
     return this.session.carpool.some(car => 
@@ -245,8 +251,26 @@ export class DetailedSessionCardComponent {
   async joinCarpoolAsPassenger(driverId: string, driverName: string) {
     if (!this.currentUser || this.isProcessing || !this.isFutureSession) return;
     
+    // Check if user has a ride offer with passengers
+    if (this.userCarpoolHasPassengers) {
+      alert('You cannot join another ride while you have passengers in your carpool. Please cancel your ride offer first or ask your passengers to leave.');
+      return;
+    }
+    
     this.isProcessing = true;
     try {
+      // If user has an empty ride offer, remove it first
+      if (this.hasUserCarpool && !this.userCarpoolHasPassengers) {
+        const removeResult = await this.dbService.leaveCarpool(this.session.id, this.currentUser.id);
+        if (!removeResult.success) {
+          console.error('Failed to remove empty carpool:', removeResult.error);
+          alert('Failed to remove your ride offer. Please try again.');
+          this.isProcessing = false;
+          return;
+        }
+      }
+      
+      // Now join the other carpool
       const result = await this.dbService.joinCarpool({
         sessionId: this.session.id,
         driverId: driverId,

@@ -178,6 +178,20 @@
   font-size: 0.85em;
 }
 
+.info-message {
+  background-color: #e7f3ff;
+  border-left: 4px solid #2196f3;
+  padding: 12px;
+  margin: 12px 0;
+  border-radius: 4px;
+}
+
+.info-message p {
+  margin: 0;
+  color: #0d47a1;
+  font-size: 0.9em;
+}
+
 .btn-small {
   padding: 6px 12px;
   font-size: 0.85em;
