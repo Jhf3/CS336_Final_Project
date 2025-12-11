@@ -42,20 +42,31 @@
       <p class="detail-content">{{ snacks || 'No snack information' }}</p>
       
       @if (currentUser && isFutureSession) {
-        <div class="input-group">
-          <input 
-            type="text" 
-            [(ngModel)]="snackInput" 
-            placeholder="What will you bring? (e.g., chips, cookies, etc.)"
-            class="text-input"
-            [disabled]="isProcessing">
-          <button 
-            class="btn btn-add" 
-            (click)="addSnackInfo()" 
-            [disabled]="isProcessing || !snackInput.trim()">
-            {{ isProcessing ? 'Adding...' : 'Add Snack' }}
-          </button>
-        </div>
+        @if (hasUserSnack) {
+          <div class="action-group">
+            <button 
+              class="btn btn-remove" 
+              (click)="removeSnackInfo()" 
+              [disabled]="isProcessing">
+              {{ isProcessing ? 'Removing...' : 'Remove My Snack' }}
+            </button>
+          </div>
+        } @else {
+          <div class="input-group">
+            <input 
+              type="text" 
+              [(ngModel)]="snackInput" 
+              placeholder="What will you bring? (e.g., chips, cookies, etc.)"
+              class="text-input"
+              [disabled]="isProcessing">
+            <button 
+              class="btn btn-add" 
+              (click)="addSnackInfo()" 
+              [disabled]="isProcessing || !snackInput.trim()">
+              {{ isProcessing ? 'Adding...' : 'Add Snack' }}
+            </button>
+          </div>
+        }
       }
     </div>
 
@@ -64,20 +75,31 @@
       <p class="detail-content">{{ carpool || 'No carpool information' }}</p>
       
       @if (currentUser && isFutureSession) {
-        <div class="input-group">
-          <input 
-            type="text" 
-            [(ngModel)]="carpoolInput" 
-            placeholder="Offer a ride or request carpool"
-            class="text-input"
-            [disabled]="isProcessing">
-          <button 
-            class="btn btn-add" 
-            (click)="addCarpoolInfo()" 
-            [disabled]="isProcessing || !carpoolInput.trim()">
-            {{ isProcessing ? 'Adding...' : 'Offer Ride' }}
-          </button>
-        </div>
+        @if (hasUserCarpool) {
+          <div class="action-group">
+            <button 
+              class="btn btn-remove" 
+              (click)="removeCarpoolInfo()" 
+              [disabled]="isProcessing">
+              {{ isProcessing ? 'Removing...' : 'Remove My Carpool' }}
+            </button>
+          </div>
+        } @else {
+          <div class="input-group">
+            <input 
+              type="text" 
+              [(ngModel)]="carpoolInput" 
+              placeholder="Offer a ride or request carpool"
+              class="text-input"
+              [disabled]="isProcessing">
+            <button 
+              class="btn btn-add" 
+              (click)="addCarpoolInfo()" 
+              [disabled]="isProcessing || !carpoolInput.trim()">
+              {{ isProcessing ? 'Adding...' : 'Offer Ride' }}
+            </button>
+          </div>
+        }
       }
     </div>
 

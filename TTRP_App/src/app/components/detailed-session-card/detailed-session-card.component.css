@@ -117,6 +117,12 @@
   gap: 8px;
 }
 
+.action-group {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
 .input-group {
   margin-top: 12px;
   display: flex;
@@ -195,6 +201,17 @@
   background-color: #3a7bc8;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+}
+
+.btn-remove {
+  background-color: #ff9800;
+  color: white;
+}
+
+.btn-remove:hover:not(:disabled) {
+  background-color: #e68900;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
 }
 
 @media (max-width: 768px) {

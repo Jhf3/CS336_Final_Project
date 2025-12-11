@@ -48,6 +48,16 @@ export class DetailedSessionCardComponent {
     return this.sessionDate > new Date();
   }
 
+  get hasUserSnack(): boolean {
+    if (!this.currentUser) return false;
+    return this.session.snacks.some(snack => snack.userId === this.currentUser!.id);
+  }
+
+  get hasUserCarpool(): boolean {
+    if (!this.currentUser) return false;
+    return this.session.carpool.some(car => car.driverId === this.currentUser!.id);
+  }
+
   async addPlayerToSession() {
     if (!this.currentUser || this.isProcessing || !this.isFutureSession) return;
     
@@ -135,6 +145,44 @@ export class DetailedSessionCardComponent {
       }
     } catch (error) {
       console.error('Error adding carpool:', error);
+      alert('An error occurred. Please try again.');
+    } finally {
+      this.isProcessing = false;
+    }
+  }
+
+  async removeSnackInfo() {
+    if (!this.currentUser || this.isProcessing || !this.isFutureSession) return;
+    
+    this.isProcessing = true;
+    try {
+      const result = await this.dbService.removeSnack(this.session.id, this.currentUser.id);
+      
+      if (!result.success) {
+        console.error('Failed to remove snack:', result.error);
+        alert('Failed to remove snack information. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error removing snack:', error);
+      alert('An error occurred. Please try again.');
+    } finally {
+      this.isProcessing = false;
+    }
+  }
+
+  async removeCarpoolInfo() {
+    if (!this.currentUser || this.isProcessing || !this.isFutureSession) return;
+    
+    this.isProcessing = true;
+    try {
+      const result = await this.dbService.leaveCarpool(this.session.id, this.currentUser.id);
+      
+      if (!result.success) {
+        console.error('Failed to remove carpool:', result.error);
+        alert('Failed to remove carpool information. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error removing carpool:', error);
       alert('An error occurred. Please try again.');
     } finally {
       this.isProcessing = false;
