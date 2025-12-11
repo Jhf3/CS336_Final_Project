@@ -56,4 +56,69 @@
   <footer class="footer">
     <p>&copy; 2025 TTRP App - CS336 Final Project</p>
   </footer>
+
+  <!-- New Session Modal -->
+  <div *ngIf="showNewSessionModal" class="modal-overlay" (click)="closeNewSessionModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>➕ Create New Session</h2>
+        <button class="close-btn" (click)="closeNewSessionModal()">&times;</button>
+      </div>
+      
+      <form (ngSubmit)="createNewSession()" class="session-form">
+        <div class="form-group">
+          <label for="sessionDate">Session Date:</label>
+          <input 
+            type="date" 
+            id="sessionDate" 
+            [(ngModel)]="newSessionDate" 
+            name="sessionDate"
+            [min]="getMinDate()"
+            required>
+        </div>
+        
+        <div class="form-group">
+          <label for="sessionTime">Session Time:</label>
+          <input 
+            type="time" 
+            id="sessionTime" 
+            [(ngModel)]="newSessionTime" 
+            name="sessionTime"
+            required>
+        </div>
+        
+        <div class="form-group">
+          <label for="sessionNotes">Host Notes (Optional):</label>
+          <textarea 
+            id="sessionNotes" 
+            [(ngModel)]="newSessionNotes" 
+            name="sessionNotes"
+            placeholder="Add any notes about the session (location, what to bring, etc.)"
+            rows="4">
+          </textarea>
+        </div>
+        
+        <div *ngIf="sessionCreationError" class="error-message">
+          {{ sessionCreationError }}
+        </div>
+        
+        <div class="modal-actions">
+          <button 
+            type="button" 
+            class="btn btn-secondary" 
+            (click)="closeNewSessionModal()"
+            [disabled]="isCreatingSession">
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-primary" 
+            [disabled]="isCreatingSession || !newSessionDate || !newSessionTime">
+            <span *ngIf="isCreatingSession">Creating...</span>
+            <span *ngIf="!isCreatingSession">Create Session</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>

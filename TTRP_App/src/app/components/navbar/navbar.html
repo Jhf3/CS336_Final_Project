@@ -9,14 +9,27 @@
   <p class="subtitle">{{ subtitle }}</p>
   
   <div class="header-actions">
-    @for (navBtn of navigationButtons; track navBtn.route) {
+    @for (navBtn of navigationButtons; track navBtn.route || navBtn.label) {
       @if (navBtn.disabled) {
         <button class="btn" [ngClass]="'btn-' + (navBtn.style || 'primary')" disabled>
+          @if (navBtn.icon) {
+            <span class="btn-icon">{{ navBtn.icon }}</span>
+          }
           {{ navBtn.label }}
           <span class="coming-soon">(Coming Soon)</span>
         </button>
+      } @else if (navBtn.action) {
+        <button class="btn" [ngClass]="'btn-' + (navBtn.style || 'primary')" (click)="onButtonClick(navBtn)">
+          @if (navBtn.icon) {
+            <span class="btn-icon">{{ navBtn.icon }}</span>
+          }
+          {{ navBtn.label }}
+        </button>
       } @else {
         <a [routerLink]="navBtn.route" class="btn" [ngClass]="'btn-' + (navBtn.style || 'primary')">
+          @if (navBtn.icon) {
+            <span class="btn-icon">{{ navBtn.icon }}</span>
+          }
           {{ navBtn.label }}
         </a>
       }
