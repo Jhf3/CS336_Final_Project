@@ -110,6 +110,90 @@
   margin-top: 8px;
 }
 
+/* Carpool Specific Styling */
+.carpool-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.carpool-item {
+  background-color: #f0f8ff;
+  border: 2px solid #4a90e2;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.carpool-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.carpool-capacity {
+  background-color: #4a90e2;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
+.carpool-passengers {
+  margin: 6px 0;
+  color: #555;
+  font-style: italic;
+}
+
+.carpool-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.carpool-offer-section {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid #28a745;
+}
+
+.carpool-offer-section h4 {
+  margin: 0 0 8px 0;
+  color: #28a745;
+  font-size: 1em;
+}
+
+.capacity-input {
+  max-width: 100px;
+}
+
+.help-text {
+  display: block;
+  margin-top: 4px;
+  color: #666;
+  font-size: 0.85em;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 0.85em;
+}
+
+.btn-join-carpool {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.btn-join-carpool:hover:not(:disabled) {
+  background-color: #138496;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+}
+
 /* Interactive Elements Styling */
 .player-actions {
   margin-top: 12px;

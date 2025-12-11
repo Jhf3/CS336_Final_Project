@@ -72,32 +72,85 @@
 
     <div class="detail-section">
       <h3>Carpool</h3>
-      <p class="detail-content">{{ carpool || 'No carpool information' }}</p>
       
+      <!-- Display current carpools -->
+      @if (session.carpool && session.carpool.length > 0) {
+        <div class="carpool-list">
+          @for (car of session.carpool; track car.driverId) {
+            <div class="carpool-item">
+              <div class="carpool-header">
+                <strong>🚗 {{ car.driverName }}</strong>
+                <span class="carpool-capacity">{{ car.passengers.length }}/{{ car.capacity }} seats</span>
+              </div>
+              @if (car.passengers.length > 0) {
+                <div class="carpool-passengers">
+                  <small>Passengers: {{ getPassengerNames(car) }}</small>
+                </div>
+              }
+              
+              <!-- Actions for this carpool -->
+              @if (currentUser && isFutureSession) {
+                @if (car.driverId === currentUser.id) {
+                  <!-- Driver's own carpool -->
+                  <div class="carpool-actions">
+                    <button 
+                      class="btn btn-small btn-remove" 
+                      (click)="removeCarpoolInfo()" 
+                      [disabled]="isProcessing">
+                      {{ isProcessing ? 'Removing...' : 'Cancel Ride Offer' }}
+                    </button>
+                  </div>
+                } @else if (isCurrentUserPassengerInCarpool(car)) {
+                  <!-- User is a passenger in this carpool -->
+                  <div class="carpool-actions">
+                    <button 
+                      class="btn btn-small btn-remove" 
+                      (click)="leavePassengerCarpool()" 
+                      [disabled]="isProcessing">
+                      {{ isProcessing ? 'Leaving...' : 'Leave This Ride' }}
+                    </button>
+                  </div>
+                } @else if (car.passengers.length < car.capacity && !isUserPassenger) {
+                  <!-- Available carpool to join -->
+                  <div class="carpool-actions">
+                    <button 
+                      class="btn btn-small btn-join-carpool" 
+                      (click)="joinCarpoolAsPassenger(car.driverId, car.driverName)" 
+                      [disabled]="isProcessing">
+                      {{ isProcessing ? 'Joining...' : 'Join This Ride' }}
+                    </button>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="detail-content">No carpool arrangements yet</p>
+      }
+      
+      <!-- Offer ride section -->
       @if (currentUser && isFutureSession) {
-        @if (hasUserCarpool) {
-          <div class="action-group">
-            <button 
-              class="btn btn-remove" 
-              (click)="removeCarpoolInfo()" 
-              [disabled]="isProcessing">
-              {{ isProcessing ? 'Removing...' : 'Remove My Carpool' }}
-            </button>
-          </div>
-        } @else {
-          <div class="input-group">
-            <input 
-              type="text" 
-              [(ngModel)]="carpoolInput" 
-              placeholder="Offer a ride or request carpool"
-              class="text-input"
-              [disabled]="isProcessing">
-            <button 
-              class="btn btn-add" 
-              (click)="addCarpoolInfo()" 
-              [disabled]="isProcessing || !carpoolInput.trim()">
-              {{ isProcessing ? 'Adding...' : 'Offer Ride' }}
-            </button>
+        @if (!hasUserCarpool && !isUserPassenger) {
+          <div class="carpool-offer-section">
+            <h4>Offer a Ride</h4>
+            <div class="input-group">
+              <input 
+                type="number" 
+                [(ngModel)]="carpoolCapacity" 
+                min="1"
+                max="10"
+                placeholder="Capacity"
+                class="text-input capacity-input"
+                [disabled]="isProcessing">
+              <button 
+                class="btn btn-add" 
+                (click)="addCarpoolInfo()" 
+                [disabled]="isProcessing">
+                {{ isProcessing ? 'Offering...' : 'Offer Ride' }}
+              </button>
+            </div>
+            <small class="help-text">Enter the number of passengers you can take (1-10)</small>
           </div>
         }
       }

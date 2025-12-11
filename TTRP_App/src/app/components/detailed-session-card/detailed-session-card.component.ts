@@ -27,6 +27,7 @@ export class DetailedSessionCardComponent {
   // Form inputs
   snackInput: string = '';
   carpoolInput: string = '';
+  carpoolCapacity: number = 4;
   isProcessing: boolean = false;
 
   // Host editing states
@@ -64,6 +65,39 @@ export class DetailedSessionCardComponent {
   get hasUserCarpool(): boolean {
     if (!this.currentUser) return false;
     return this.session.carpool.some(car => car.driverId === this.currentUser!.id);
+  }
+
+  get isUserPassenger(): boolean {
+    if (!this.currentUser) return false;
+    return this.session.carpool.some(car => 
+      car.passengers.some(p => p.userId === this.currentUser!.id)
+    );
+  }
+
+  get userPassengerCarpool(): any {
+    if (!this.currentUser) return null;
+    return this.session.carpool.find(car => 
+      car.passengers.some(p => p.userId === this.currentUser!.id)
+    );
+  }
+
+  get availableCarpools(): any[] {
+    if (!this.currentUser) return [];
+    // Return carpools that aren't full and aren't offered by current user
+    return this.session.carpool.filter(car => 
+      car.driverId !== this.currentUser!.id &&
+      car.passengers.length < car.capacity
+    );
+  }
+
+  getPassengerNames(carpool: any): string {
+    if (!carpool.passengers || carpool.passengers.length === 0) return '';
+    return carpool.passengers.map((p: any) => p.userName).join(', ');
+  }
+
+  isCurrentUserPassengerInCarpool(carpool: any): boolean {
+    if (!this.currentUser || !carpool.passengers) return false;
+    return carpool.passengers.some((p: any) => p.userId === this.currentUser!.id);
   }
 
   get isHost(): boolean {
@@ -139,7 +173,13 @@ export class DetailedSessionCardComponent {
   }
 
   async addCarpoolInfo() {
-    if (!this.currentUser || this.isProcessing || !this.carpoolInput.trim() || !this.isFutureSession) return;
+    if (!this.currentUser || this.isProcessing || !this.isFutureSession) return;
+    
+    // Validate capacity
+    if (this.carpoolCapacity < 1 || this.carpoolCapacity > 10) {
+      alert('Capacity must be between 1 and 10');
+      return;
+    }
     
     this.isProcessing = true;
     try {
@@ -147,7 +187,7 @@ export class DetailedSessionCardComponent {
         sessionId: this.session.id,
         driverId: this.currentUser.id,
         driverName: this.currentUser.username,
-        capacity: 4  // Default capacity, could be made configurable
+        capacity: this.carpoolCapacity
       });
       
       if (result.success) {
@@ -196,6 +236,49 @@ export class DetailedSessionCardComponent {
       }
     } catch (error) {
       console.error('Error removing carpool:', error);
+      alert('An error occurred. Please try again.');
+    } finally {
+      this.isProcessing = false;
+    }
+  }
+
+  async joinCarpoolAsPassenger(driverId: string, driverName: string) {
+    if (!this.currentUser || this.isProcessing || !this.isFutureSession) return;
+    
+    this.isProcessing = true;
+    try {
+      const result = await this.dbService.joinCarpool({
+        sessionId: this.session.id,
+        driverId: driverId,
+        passengerId: this.currentUser.id,
+        passengerName: this.currentUser.username
+      });
+      
+      if (!result.success) {
+        console.error('Failed to join carpool:', result.error);
+        alert(result.error.message || 'Failed to join carpool. Please try again.');
+      }
+    } catch (error: any) {
+      console.error('Error joining carpool:', error);
+      alert(error?.message || 'An error occurred. Please try again.');
+    } finally {
+      this.isProcessing = false;
+    }
+  }
+
+  async leavePassengerCarpool() {
+    if (!this.currentUser || this.isProcessing || !this.isFutureSession) return;
+    
+    this.isProcessing = true;
+    try {
+      const result = await this.dbService.leaveCarpool(this.session.id, this.currentUser.id);
+      
+      if (!result.success) {
+        console.error('Failed to leave carpool:', result.error);
+        alert('Failed to leave carpool. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error leaving carpool:', error);
       alert('An error occurred. Please try again.');
     } finally {
       this.isProcessing = false;
