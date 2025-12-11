@@ -48,6 +48,10 @@
   cursor: not-allowed;
 }
 
+.btn-icon {
+  margin-right: 6px;
+}
+
 .btn-primary {
   background-color: #4a90e2;
   color: white;

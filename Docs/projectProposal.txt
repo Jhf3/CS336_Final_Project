@@ -1,8 +1,6 @@
 Students: Jacob Foote, Simon Troyer
-SLOS: H2, C5, J1, J2, J5A, 
-      T1A, T2A, AN4, AN5, AN10, 
-      P3, P5
-Maybe: AJ2A, AN6, AN8, P4A
+SLOS: H2, C5, J1, J2, T1A, T2A, AN4, AN10, P3, P5, AJ2A,
+Maybe: AN6, AN8, P4A, J5A, AN5,
 
 Our team is building a TableTop RPG scheduling app that assists playgroups with
 logistical challenges.  Our app would allow hosts to easily keep track of 

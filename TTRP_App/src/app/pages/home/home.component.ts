@@ -1,16 +1,18 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { SessionListComponent } from '../../components/session-list/session-list.component';
 import { Navbar, NavButton } from '../../components/navbar/navbar';
 import { DatabaseService } from '../../services/database-service';
-import { Group, User, Session } from '../../../../types/types';
+import { Group, User, Session, CreateSessionRequest } from '../../../../types/types';
 import { Subscription } from 'rxjs';
+import { Timestamp } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, SessionListComponent, Navbar, RouterLink],
+  imports: [CommonModule, SessionListComponent, Navbar, RouterLink, FormsModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -18,7 +20,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   
   navigationButtons: NavButton[] = [
-    { label: 'Manage Groups', route: '/groups', style: 'primary' },
+    { label: 'New Session', action: () => this.openNewSessionModal(), style: 'primary', icon: '➕' },
+    { label: 'Manage Groups', route: '/groups', style: 'secondary' },
     { label: 'Campaign History', route: '/campaign-history', style: 'secondary' },
     { label: 'Debug', route: '/debug', style: 'secondary' }
   ];
@@ -31,6 +34,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   upcomingSessions: Session[] = [];
   isLoadingSessions: boolean = true;
   errorMessage: string = '';
+  
+  // New session form
+  showNewSessionModal: boolean = false;
+  newSessionDate: string = '';
+  newSessionTime: string = '';
+  newSessionNotes: string = '';
+  isCreatingSession: boolean = false;
+  sessionCreationError: string = '';
   
   // Subscription management
   private sessionsSubscription: Subscription | null = null;
@@ -172,5 +183,123 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.errorMessage = '';
       this.setupSessionsStream();
     }
+  }
+
+  // ==================== NEW SESSION MODAL METHODS ====================
+
+  /**
+   * Open the new session modal
+   */
+  openNewSessionModal() {
+    if (!this.hasSelectedGroup()) {
+      this.errorMessage = 'Please select a group first before creating a session.';
+      this.cdr.detectChanges(); // Force change detection for error message
+      return;
+    }
+    
+    // Reset form
+    this.newSessionDate = '';
+    this.newSessionTime = '';
+    this.newSessionNotes = '';
+    this.sessionCreationError = '';
+    this.isCreatingSession = false;
+    
+    // Set default date to tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    this.newSessionDate = tomorrow.toISOString().split('T')[0];
+    
+    // Set default time to 7 PM
+    this.newSessionTime = '19:00';
+    
+    this.showNewSessionModal = true;
+    this.cdr.detectChanges(); // Force change detection when opening modal
+  }
+
+  /**
+   * Close the new session modal
+   */
+  closeNewSessionModal() {
+    this.showNewSessionModal = false;
+    this.sessionCreationError = '';
+    this.cdr.detectChanges(); // Force change detection when closing modal
+  }
+
+  /**
+   * Create a new session using the form data
+   */
+  async createNewSession() {
+    if (!this.selectedGroup || !this.currentUser) {
+      this.sessionCreationError = 'Missing group or user information.';
+      return;
+    }
+
+    if (!this.newSessionDate || !this.newSessionTime) {
+      this.sessionCreationError = 'Please select both date and time for the session.';
+      this.cdr.detectChanges(); // Force change detection for validation error
+      return;
+    }
+
+    this.isCreatingSession = true;
+    this.sessionCreationError = '';
+    this.cdr.detectChanges(); // Force change detection when starting creation
+
+    try {
+      // Combine date and time into a single timestamp
+      const dateTimeString = `${this.newSessionDate}T${this.newSessionTime}:00`;
+      const sessionDateTime = new Date(dateTimeString);
+      
+      // Check if the session is in the future
+      if (sessionDateTime <= new Date()) {
+        this.sessionCreationError = 'Session date and time must be in the future.';
+        this.isCreatingSession = false;
+        this.cdr.detectChanges(); // Force change detection for date validation error
+        return;
+      }
+
+      const createSessionRequest: CreateSessionRequest = {
+        groupId: this.selectedGroup.id,
+        sessionDate: Timestamp.fromDate(sessionDateTime),
+        hostNotes: this.newSessionNotes.trim(),
+        isConfirmed: false, // New sessions start as unconfirmed
+        availableUsers: [], // Empty initially, users can confirm later
+        snacks: [],
+        carpool: []
+      };
+
+      console.log('Creating session with request:', createSessionRequest);
+      
+      const result = await this.dbService.createSession(createSessionRequest);
+      
+      if (result.success) {
+        console.log('Session created successfully:', result.data);
+        this.closeNewSessionModal();
+        
+        // Show success message briefly
+        this.errorMessage = '';
+        this.cdr.detectChanges(); // Force change detection for success state
+        // The real-time stream will automatically update the sessions list
+      } else {
+        console.error('Failed to create session:', result.error);
+        this.sessionCreationError = result.error.message || 'Failed to create session. Please try again.';
+        this.cdr.detectChanges(); // Force change detection for creation error
+      }
+    } catch (error) {
+      console.error('Error creating session:', error);
+      this.sessionCreationError = 'An error occurred while creating the session. Please try again.';
+      this.cdr.detectChanges(); // Force change detection for exception error
+    } finally {
+      this.isCreatingSession = false;
+      this.cdr.detectChanges(); // Force change detection when ending creation
+    }
+  }
+
+  /**
+   * Get minimum date for session date picker (tomorrow)
+   */
+  getMinDate(): string {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
   }
 }
