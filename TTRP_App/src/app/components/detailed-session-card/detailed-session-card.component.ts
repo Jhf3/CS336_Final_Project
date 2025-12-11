@@ -29,6 +29,14 @@ export class DetailedSessionCardComponent {
   carpoolInput: string = '';
   isProcessing: boolean = false;
 
+  // Host editing states
+  isEditingHostNotes: boolean = false;
+  isEditingSecretNotes: boolean = false;
+  isEditingExternalAvailability: boolean = false;
+  hostNotesInput: string = '';
+  secretNotesInput: string = '';
+  externalAvailabilityInput: string = '';
+
   constructor(private dbService: DatabaseService) {}
 
   get sessionDate(): Date {
@@ -56,6 +64,11 @@ export class DetailedSessionCardComponent {
   get hasUserCarpool(): boolean {
     if (!this.currentUser) return false;
     return this.session.carpool.some(car => car.driverId === this.currentUser!.id);
+  }
+
+  get isHost(): boolean {
+    if (!this.currentUser) return false;
+    return this.session.hostId === this.currentUser.id;
   }
 
   async addPlayerToSession() {
@@ -183,6 +196,112 @@ export class DetailedSessionCardComponent {
       }
     } catch (error) {
       console.error('Error removing carpool:', error);
+      alert('An error occurred. Please try again.');
+    } finally {
+      this.isProcessing = false;
+    }
+  }
+
+  // Host editing methods
+  startEditingHostNotes() {
+    this.hostNotesInput = this.session.hostNotes || '';
+    this.isEditingHostNotes = true;
+  }
+
+  cancelEditingHostNotes() {
+    this.isEditingHostNotes = false;
+    this.hostNotesInput = '';
+  }
+
+  async saveHostNotes() {
+    if (!this.isHost || this.isProcessing) return;
+    
+    this.isProcessing = true;
+    try {
+      const result = await this.dbService.updateSession({
+        sessionId: this.session.id,
+        hostNotes: this.hostNotesInput
+      });
+      
+      if (result.success) {
+        this.isEditingHostNotes = false;
+        this.hostNotesInput = '';
+      } else {
+        console.error('Failed to update host notes:', result.error);
+        alert('Failed to update session notes. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error updating host notes:', error);
+      alert('An error occurred. Please try again.');
+    } finally {
+      this.isProcessing = false;
+    }
+  }
+
+  startEditingSecretNotes() {
+    this.secretNotesInput = this.session.secretNotes || '';
+    this.isEditingSecretNotes = true;
+  }
+
+  cancelEditingSecretNotes() {
+    this.isEditingSecretNotes = false;
+    this.secretNotesInput = '';
+  }
+
+  async saveSecretNotes() {
+    if (!this.isHost || this.isProcessing) return;
+    
+    this.isProcessing = true;
+    try {
+      const result = await this.dbService.updateSession({
+        sessionId: this.session.id,
+        secretNotes: this.secretNotesInput
+      });
+      
+      if (result.success) {
+        this.isEditingSecretNotes = false;
+        this.secretNotesInput = '';
+      } else {
+        console.error('Failed to update secret notes:', result.error);
+        alert('Failed to update secret notes. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error updating secret notes:', error);
+      alert('An error occurred. Please try again.');
+    } finally {
+      this.isProcessing = false;
+    }
+  }
+
+  startEditingExternalAvailability() {
+    this.externalAvailabilityInput = this.session.externalAvailability || '';
+    this.isEditingExternalAvailability = true;
+  }
+
+  cancelEditingExternalAvailability() {
+    this.isEditingExternalAvailability = false;
+    this.externalAvailabilityInput = '';
+  }
+
+  async saveExternalAvailability() {
+    if (!this.isHost || this.isProcessing) return;
+    
+    this.isProcessing = true;
+    try {
+      const result = await this.dbService.updateSession({
+        sessionId: this.session.id,
+        externalAvailability: this.externalAvailabilityInput
+      });
+      
+      if (result.success) {
+        this.isEditingExternalAvailability = false;
+        this.externalAvailabilityInput = '';
+      } else {
+        console.error('Failed to update external availability:', result.error);
+        alert('Failed to update external availability. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error updating external availability:', error);
       alert('An error occurred. Please try again.');
     } finally {
       this.isProcessing = false;

@@ -48,7 +48,7 @@ export class SessionCardComponent implements OnInit {
   }
   
   get detailedExternalAvailability(): string {
-    return 'Game store reserved until 10 PM';
+    return this.session.externalAvailability || '';
   }
   
   get availablePlayers(): string[] {
@@ -81,14 +81,7 @@ export class SessionCardComponent implements OnInit {
   }
   
   get secretNotes(): string {
-    const secretOptions = [
-      `Plot Hook: The sealed door leads to an ancient vault containing a powerful artifact.\n\nNPCs to introduce:\n- Mysterious hooded figure watching from shadows\n- Ancient spirit bound to the vault\n\nFuture Events:\n- The goblins were sent by a dark wizard\n- The artifact is one of five needed to prevent a catastrophe`,
-      `Hidden Details:\n- The unicorn is actually a cursed prince\n- The dark force is connected to the main villain\n- A druid circle knows more than they're sharing\n\nNext Session Setup:\n- Introduce the corrupted treant boss\n- Plant seeds about the Forest King's return`,
-      `Secret Information:\n- The smugglers work for the Thieves' Guild\n- One smuggler is actually an undercover guard\n- There's a bigger conspiracy at play\n\nPlot Threads:\n- The stolen goods include a magical compass\n- A rival party is also investigating`,
-      `DM Notes:\n- The tree contains souls of past adventurers\n- Main villain is watching from afar\n- One party member's backstory ties in here\n\nUpcoming Reveals:\n- The citadel was a prison, not a temple\n- Ancient evil is stirring beneath`,
-      `Critical Info:\n- Dragon cult is behind the attack\n- Village elder knows ancient dragon lore\n- PC's family heirloom is dragon-related\n\nNext Steps:\n- Introduce dragon cultist NPC\n- Foreshadow dragon's lair location\n- Connect to main campaign arc`
-    ];
-    return secretOptions[this.sessionDate.getDate() % secretOptions.length];
+    return this.session.secretNotes || '';
   }
   
   openModal() {

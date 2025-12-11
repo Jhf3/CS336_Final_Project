@@ -56,6 +56,8 @@ export interface Session {
   isConfirmed: boolean;
   sessionDate: Timestamp;
   hostNotes: string;
+  secretNotes?: string;  // DM-only notes
+  externalAvailability?: string;  // External venue/location availability info
   availableUsers: string[];  // Array of user IDs who confirmed availability
   snacks: SessionSnack[];  // Array of snack contributions
   carpool: SessionCarpool[];  // Array of carpool arrangements
@@ -77,6 +79,8 @@ export interface CreateSessionRequest {
   groupId: string;
   sessionDate: Timestamp;
   hostNotes?: string;
+  secretNotes?: string;
+  externalAvailability?: string;
   isConfirmed?: boolean;
   availableUsers?: string[];
   snacks?: SessionSnack[];
@@ -88,6 +92,8 @@ export interface UpdateSessionRequest {
   isConfirmed?: boolean;
   sessionDate?: Timestamp;
   hostNotes?: string;
+  secretNotes?: string;
+  externalAvailability?: string;
   availableUsers?: string[];
   snacks?: SessionSnack[];
   carpool?: SessionCarpool[];

@@ -370,13 +370,15 @@ export class DatabaseService {
       const group = groupResult.data;
       
       const newSession: Omit<Session, 'id'> = {
-        groupId: request.groupId,
+        groupId: group.id,
         groupName: group.name,
         hostId: group.hostId,
         hostName: group.hostName,
         isConfirmed: request.isConfirmed ?? false,
         sessionDate: request.sessionDate,
         hostNotes: request.hostNotes ?? '',
+        secretNotes: request.secretNotes ?? '',
+        externalAvailability: request.externalAvailability ?? '',
         availableUsers: request.availableUsers ?? [],
         snacks: request.snacks ?? [],
         carpool: request.carpool ?? [],
@@ -415,6 +417,8 @@ export class DatabaseService {
       if (request.isConfirmed !== undefined) updateData.isConfirmed = request.isConfirmed;
       if (request.sessionDate) updateData.sessionDate = request.sessionDate;
       if (request.hostNotes !== undefined) updateData.hostNotes = request.hostNotes;
+      if (request.secretNotes !== undefined) updateData.secretNotes = request.secretNotes;
+      if (request.externalAvailability !== undefined) updateData.externalAvailability = request.externalAvailability;
 
       await updateDoc(sessionRef, updateData);
 
