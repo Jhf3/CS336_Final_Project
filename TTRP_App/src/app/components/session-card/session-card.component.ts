@@ -15,8 +15,12 @@ export class SessionCardComponent implements OnInit {
   @Input() session!: Session;
   
   showModal = false;
-  isDM = true;
   currentUser: User | null = null;
+
+  get isDM(): boolean {
+    if (!this.currentUser) return false;
+    return this.session.hostId === this.currentUser.id;
+  }
 
   ngOnInit() {
     // Load current user from localStorage
@@ -81,6 +85,10 @@ export class SessionCardComponent implements OnInit {
   }
   
   get secretNotes(): string {
+    // Only return secret notes if current user is the host
+    if (!this.currentUser || this.session.hostId !== this.currentUser.id) {
+      return '';
+    }
     return this.session.secretNotes || '';
   }
   

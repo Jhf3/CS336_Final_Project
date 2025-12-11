@@ -19,13 +19,6 @@ import { Timestamp } from '@angular/fire/firestore';
 export class HomeComponent implements OnInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   
-  navigationButtons: NavButton[] = [
-    { label: 'New Session', action: () => this.openNewSessionModal(), style: 'primary', icon: '➕' },
-    { label: 'Manage Groups', route: '/groups', style: 'secondary' },
-    { label: 'Campaign History', route: '/campaign-history', style: 'secondary' },
-    { label: 'Debug', route: '/debug', style: 'secondary' }
-  ];
-
   // User and group data
   currentUser: User | null = null;
   selectedGroup: Group | null = null;
@@ -45,6 +38,23 @@ export class HomeComponent implements OnInit, OnDestroy {
   
   // Subscription management
   private sessionsSubscription: Subscription | null = null;
+  
+  get navigationButtons(): NavButton[] {
+    const buttons: NavButton[] = [];
+    
+    // Only show New Session button if user is the host
+    if (this.isUserHost()) {
+      buttons.push({ label: 'New Session', action: () => this.openNewSessionModal(), style: 'primary', icon: '➕' });
+    }
+    
+    buttons.push(
+      { label: 'Manage Groups', route: '/groups', style: 'secondary' },
+      { label: 'Campaign History', route: '/campaign-history', style: 'secondary' },
+      { label: 'Debug', route: '/debug', style: 'secondary' }
+    );
+    
+    return buttons;
+  }
   
   constructor(
     private dbService: DatabaseService,
@@ -170,6 +180,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     return this.selectedGroup !== null;
   }
   
+  isUserHost(): boolean {
+    if (!this.currentUser || !this.selectedGroup) {
+      return false;
+    }
+    return this.selectedGroup.hostId === this.currentUser.id;
+  }
+  
   /**
    * Public method to retry loading sessions - can be called from template
    */
@@ -194,6 +211,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (!this.hasSelectedGroup()) {
       this.errorMessage = 'Please select a group first before creating a session.';
       this.cdr.detectChanges(); // Force change detection for error message
+      return;
+    }
+    
+    if (!this.isUserHost()) {
+      this.errorMessage = 'Only the group host can create sessions.';
+      this.cdr.detectChanges();
       return;
     }
     

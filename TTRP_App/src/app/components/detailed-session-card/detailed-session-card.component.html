@@ -254,21 +254,21 @@
       </div>
     }
 
-    @if ((isDM && secretNotes) || (isHost && isFutureSession)) {
+    @if (isHost) {
       <div class="notes-section">
         @if (!isEditingSecretNotes) {
           @if (secretNotes) {
             <app-secret-note-card 
               [descriptiveNotes]="secretNotes">
             </app-secret-note-card>
-          } @else if (isHost) {
+          } @else {
             <div class="detail-section">
               <h3>Secret Notes (DM Only)</h3>
               <p class="detail-content">No secret notes yet</p>
             </div>
           }
           
-          @if (isHost && isFutureSession) {
+          @if (isFutureSession) {
             <div class="action-group" style="margin-top: 8px;">
               <button 
                 class="btn btn-edit" 
