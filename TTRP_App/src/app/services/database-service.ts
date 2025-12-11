@@ -456,8 +456,7 @@ export class DatabaseService {
     try {
       const q = query(
         this.sessionsCollection, 
-        where('groupId', '==', groupId),
-        orderBy('sessionDate', 'desc')
+        where('groupId', '==', groupId)
       );
       const querySnapshot = await getDocs(q);
 
@@ -465,6 +464,9 @@ export class DatabaseService {
       querySnapshot.forEach((doc) => {
         sessions.push({ id: doc.id, ...doc.data() } as Session);
       });
+
+      // Sort sessions by date descending (client-side)
+      sessions.sort((a, b) => b.sessionDate.toDate().getTime() - a.sessionDate.toDate().getTime());
 
       return { success: true, data: sessions };
     } catch (error) {
@@ -584,10 +586,13 @@ export class DatabaseService {
   getGroupSessionsStream(groupId: string): Observable<Session[]> {
     const q = query(
       this.sessionsCollection,
-      where('groupId', '==', groupId),
-      orderBy('sessionDate', 'desc')
+      where('groupId', '==', groupId)
     );
-    return collectionData(q, { idField: 'id' }) as Observable<Session[]>;
+    return collectionData(q, { idField: 'id' }).pipe(
+      map((sessions: any[]) => sessions.sort((a, b) => 
+        b.sessionDate.toDate().getTime() - a.sessionDate.toDate().getTime()
+      ))
+    ) as Observable<Session[]>;
   }
 
   /**

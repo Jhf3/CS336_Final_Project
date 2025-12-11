@@ -80,6 +80,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     const storedGroup = localStorage.getItem('selectedGroup');
     if (storedGroup) {
       this.selectedGroup = JSON.parse(storedGroup);
+      console.log('Loaded selected group:', this.selectedGroup);
+    } else {
+      console.log('No selected group found in localStorage');
     }
   }
   
@@ -102,7 +105,19 @@ export class HomeComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error loading sessions stream:', error);
-          this.errorMessage = 'Failed to load sessions. Please check your connection and try again.';
+          console.error('Group ID:', this.selectedGroup?.id);
+          console.error('Error details:', error.code, error.message);
+          
+          let errorMsg = 'Failed to load sessions.';
+          if (error.code === 'permission-denied') {
+            errorMsg += ' Check Firestore security rules.';
+          } else if (error.code === 'unavailable') {
+            errorMsg += ' Check your internet connection.';
+          } else {
+            errorMsg += ' Please try again or check the console for details.';
+          }
+          
+          this.errorMessage = errorMsg;
           this.isLoadingSessions = false;
           this.upcomingSessions = [];
           this.cdr.detectChanges(); // Force change detection on error

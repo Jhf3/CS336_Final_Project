@@ -1,13 +1,48 @@
 <div class="campaign-history-container">
     <app-navbar 
         title="Campaign History" 
-        subtitle="All previous sessions and campaign progress"
+        [subtitle]="hasSelectedGroup() ? 'All previous sessions for ' + getSelectedGroupName() : 'Select a group to view campaign history'"
         [navigationButtons]="navigationButtons">
     </app-navbar>
 
     <main class="main-content">
         <section class="history-section">
-            <app-session-list [sessions]="pastSessions"></app-session-list>
+            <!-- Loading State -->
+            <div *ngIf="isLoadingSessions" class="loading-container">
+                <p class="loading-text">Loading campaign history...</p>
+            </div>
+
+            <!-- Error State -->
+            <div *ngIf="errorMessage && !isLoadingSessions" class="error-container">
+                <p class="error-text">{{ errorMessage }}</p>
+                <button class="retry-button" (click)="retryLoadingSessions()">
+                    Retry Loading Sessions
+                </button>
+            </div>
+
+            <!-- No Group Selected -->
+            <div *ngIf="!hasSelectedGroup() && !isLoadingSessions && !errorMessage" class="no-group-container">
+                <p>No group selected. Please select a group from the Groups page to view campaign history.</p>
+                <button class="groups-button" (click)="navigateToGroups()">
+                    Go to Groups
+                </button>
+            </div>
+
+            <!-- Sessions List -->
+            <div *ngIf="hasSelectedGroup() && !isLoadingSessions && !errorMessage">
+                <div *ngIf="pastSessions.length > 0; else noSessions">
+                    <h2 class="sessions-header">Past Sessions ({{ pastSessions.length }})</h2>
+                    <app-session-list [sessions]="pastSessions"></app-session-list>
+                </div>
+                
+                <ng-template #noSessions>
+                    <div class="no-sessions-container">
+                        <h2>No Past Sessions</h2>
+                        <p>This group doesn't have any completed sessions yet.</p>
+                        <p>Sessions will appear here after their scheduled date has passed.</p>
+                    </div>
+                </ng-template>
+            </div>
         </section>
 
         <section class="dm-notes-section">
