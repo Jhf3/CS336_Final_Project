@@ -110,6 +110,93 @@
   margin-top: 8px;
 }
 
+/* Interactive Elements Styling */
+.player-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.input-group {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.text-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 12px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95em;
+  transition: border-color 0.3s ease;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
+.text-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.text-input::placeholder {
+  color: #999;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-join {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-join:hover:not(:disabled) {
+  background-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-leave {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-leave:hover:not(:disabled) {
+  background-color: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.btn-add {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.btn-add:hover:not(:disabled) {
+  background-color: #3a7bc8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+}
+
 @media (max-width: 768px) {
   .detailed-session-card {
     margin: 8px;
@@ -122,5 +209,17 @@
 
   .detail-section h3 {
     font-size: 1em;
+  }
+  
+  .input-group {
+    flex-direction: column;
+  }
+  
+  .text-input {
+    min-width: 100%;
+  }
+  
+  .btn {
+    width: 100%;
   }
 }

@@ -1,7 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, Output, EventEmitter, PLATFORM_ID, inject, OnInit } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { DetailedSessionCardComponent } from '../detailed-session-card/detailed-session-card.component';
-import { Session } from '../../../../types/types';
+import { Session, User } from '../../../../types/types';
 
 @Component({
   selector: 'app-session-card',
@@ -9,11 +9,24 @@ import { Session } from '../../../../types/types';
   templateUrl: './session-card.component.html',
   styleUrl: './session-card.component.css'
 })
-export class SessionCardComponent {
+export class SessionCardComponent implements OnInit {
+  private platformId = inject(PLATFORM_ID);
+  
   @Input() session!: Session;
   
   showModal = false;
   isDM = true;
+  currentUser: User | null = null;
+
+  ngOnInit() {
+    // Load current user from localStorage
+    if (isPlatformBrowser(this.platformId)) {
+      const storedUser = localStorage.getItem('currentUser');
+      if (storedUser) {
+        this.currentUser = JSON.parse(storedUser);
+      }
+    }
+  }
   
   // Use actual session data instead of filler
   get detailedSnacks(): string {

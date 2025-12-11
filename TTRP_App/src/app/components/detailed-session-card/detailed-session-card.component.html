@@ -15,16 +15,70 @@
       <div class="player-count">
         <p>{{ availablePlayers.length }} players confirmed</p>
       </div>
+      
+      @if (currentUser && isFutureSession) {
+        <div class="player-actions">
+          @if (!isPlayerAvailable) {
+            <button 
+              class="btn btn-join" 
+              (click)="addPlayerToSession()" 
+              [disabled]="isProcessing">
+              {{ isProcessing ? 'Joining...' : 'Join Session' }}
+            </button>
+          } @else {
+            <button 
+              class="btn btn-leave" 
+              (click)="removePlayerFromSession()" 
+              [disabled]="isProcessing">
+              {{ isProcessing ? 'Leaving...' : 'Leave Session' }}
+            </button>
+          }
+        </div>
+      }
     </div>
 
     <div class="detail-section">
       <h3>Snacks</h3>
       <p class="detail-content">{{ snacks || 'No snack information' }}</p>
+      
+      @if (currentUser && isFutureSession) {
+        <div class="input-group">
+          <input 
+            type="text" 
+            [(ngModel)]="snackInput" 
+            placeholder="What will you bring? (e.g., chips, cookies, etc.)"
+            class="text-input"
+            [disabled]="isProcessing">
+          <button 
+            class="btn btn-add" 
+            (click)="addSnackInfo()" 
+            [disabled]="isProcessing || !snackInput.trim()">
+            {{ isProcessing ? 'Adding...' : 'Add Snack' }}
+          </button>
+        </div>
+      }
     </div>
 
     <div class="detail-section">
       <h3>Carpool</h3>
       <p class="detail-content">{{ carpool || 'No carpool information' }}</p>
+      
+      @if (currentUser && isFutureSession) {
+        <div class="input-group">
+          <input 
+            type="text" 
+            [(ngModel)]="carpoolInput" 
+            placeholder="Offer a ride or request carpool"
+            class="text-input"
+            [disabled]="isProcessing">
+          <button 
+            class="btn btn-add" 
+            (click)="addCarpoolInfo()" 
+            [disabled]="isProcessing || !carpoolInput.trim()">
+            {{ isProcessing ? 'Adding...' : 'Offer Ride' }}
+          </button>
+        </div>
+      }
     </div>
 
     @if (externalAvailability) {
