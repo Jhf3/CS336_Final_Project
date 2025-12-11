@@ -20,6 +20,111 @@
   font-size: 1.8em;
 }
 
+.sessions-header {
+  color: #333;
+  margin-bottom: 16px;
+  font-size: 1.5em;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 8px;
+}
+
+/* Loading State */
+.loading-container {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.loading-text {
+  font-size: 1.2em;
+  color: #666;
+  margin: 0;
+}
+
+/* Error State */
+.error-container {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #fef2f2;
+  border: 2px solid #fecaca;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+.error-text {
+  color: #dc2626;
+  margin: 0 0 16px 0;
+  font-size: 1.1em;
+}
+
+.retry-button {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.2s;
+}
+
+.retry-button:hover {
+  background-color: #b91c1c;
+}
+
+/* No Group State */
+.no-group-container {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #f0f9ff;
+  border: 2px solid #bae6fd;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+.no-group-container p {
+  color: #0369a1;
+  margin: 0 0 16px 0;
+  font-size: 1.1em;
+}
+
+.groups-button {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.2s;
+}
+
+.groups-button:hover {
+  background-color: #1d4ed8;
+}
+
+/* No Sessions State */
+.no-sessions-container {
+  text-align: center;
+  padding: 60px 20px;
+  background-color: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+.no-sessions-container h2 {
+  color: #374151;
+  margin: 0 0 16px 0;
+  font-size: 1.5em;
+}
+
+.no-sessions-container p {
+  color: #6b7280;
+  margin: 8px 0;
+  font-size: 1em;
+  line-height: 1.5;
+}
+
 .dm-notes-section {
   background-color: #f9f9f9;
   padding: 24px;

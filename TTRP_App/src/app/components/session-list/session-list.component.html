@@ -1,9 +1,8 @@
 <div class="session-list-container">
   <div class="session-list">
-    @for (session of sessions; track session.date) {
+    @for (session of sessions; track session.id) {
       <app-session-card 
-        [date]="session.date" 
-        [availablePlayers]="session.availablePlayers">
+        [session]="session">
       </app-session-card>
     }
     @empty {

@@ -1,9 +1,10 @@
-import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { DatabaseService } from '../../services/database-service';
 import { Group, User, CreateGroupRequest } from '../../../../types/types';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-groups',
@@ -12,9 +13,12 @@ import { Group, User, CreateGroupRequest } from '../../../../types/types';
   templateUrl: './groups.component.html',
   styleUrl: './groups.component.css'
 })
-export class GroupsComponent implements OnInit {
+export class GroupsComponent implements OnInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   currentUser: User | null = null;
+  
+  // Subscription management
+  private userGroupsSubscription: Subscription | null = null;
   
   // Create group form
   newGroupName: string = '';
@@ -31,6 +35,7 @@ export class GroupsComponent implements OnInit {
   
   // UI state
   isLoading: boolean = false;
+  isLoadingGroups: boolean = true;
   isCreatingGroup: boolean = false;
   isJoiningGroup: boolean = false;
   errorMessage: string = '';
@@ -39,7 +44,8 @@ export class GroupsComponent implements OnInit {
   
   constructor(
     private dbService: DatabaseService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
   
   async ngOnInit() {
@@ -55,28 +61,38 @@ export class GroupsComponent implements OnInit {
     }
     
     this.currentUser = JSON.parse(storedUser);
-    await this.loadUserGroups();
+    this.setupGroupsStream();
     await this.loadAvailableGroups();
   }
   
-  async loadUserGroups() {
+  ngOnDestroy() {
+    // Clean up subscriptions
+    if (this.userGroupsSubscription) {
+      this.userGroupsSubscription.unsubscribe();
+    }
+  }
+  
+  setupGroupsStream() {
     if (!this.currentUser) return;
     
-    try {
-      const result = await this.dbService.getUserById(this.currentUser.id);
-      if (result.success && result.data) {
-        // Get groups from user's groupIds
-        this.userGroups = [];
-        for (const groupId of result.data.groupIds) {
-          const groupResult = await this.dbService.getGroupById(groupId);
-          if (groupResult.success && groupResult.data) {
-            this.userGroups.push(groupResult.data);
-          }
+    this.isLoadingGroups = true;
+    this.cdr.detectChanges(); // Force change detection when starting load
+    
+    // Subscribe to real-time user groups stream
+    this.userGroupsSubscription = this.dbService.getUserGroupsStream(this.currentUser.id)
+      .subscribe({
+        next: (groups: Group[]) => {
+          this.userGroups = groups;
+          this.isLoadingGroups = false;
+          this.cdr.detectChanges(); // Force change detection after data update
+        },
+        error: (error) => {
+          console.error('Error loading user groups stream:', error);
+          this.errorMessage = 'Failed to load groups';
+          this.isLoadingGroups = false;
+          this.cdr.detectChanges(); // Force change detection on error
         }
-      }
-    } catch (error) {
-      console.error('Error loading user groups:', error);
-    }
+      });
   }
   
   async loadAvailableGroups() {
@@ -112,8 +128,7 @@ export class GroupsComponent implements OnInit {
         this.newGroupName = '';
         this.newGroupDescription = '';
         
-        // Refresh the groups lists
-        await this.loadUserGroups();
+        // Groups will be automatically updated via stream
         await this.loadAvailableGroups();
         
         // Switch to my groups tab
@@ -145,8 +160,7 @@ export class GroupsComponent implements OnInit {
       if (result.success) {
         this.successMessage = 'Successfully joined the group!';
         
-        // Refresh the groups lists
-        await this.loadUserGroups();
+        // Groups will be automatically updated via stream
         await this.loadAvailableGroups();
         
         // Switch to my groups tab
@@ -175,8 +189,7 @@ export class GroupsComponent implements OnInit {
       if (result.success) {
         this.successMessage = 'Successfully left the group';
         
-        // Refresh the groups lists
-        await this.loadUserGroups();
+        // Groups will be automatically updated via stream
         await this.loadAvailableGroups();
       } else {
         this.errorMessage = (!result.success && result.error?.message) || 'Failed to leave group';

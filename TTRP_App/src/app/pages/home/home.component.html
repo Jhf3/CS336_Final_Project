@@ -1,12 +1,56 @@
 <div class="home-container">
   <app-navbar 
-    title="Upcoming Sessions" 
-    subtitle="Possible sessions for the next 1-2 weeks"
+    [title]="hasSelectedGroup() ? getSelectedGroupName() : 'TTRP App'" 
+    [subtitle]="hasSelectedGroup() ? 'Upcoming sessions for your group' : 'Select a group to view sessions'"
     [navigationButtons]="navigationButtons">
   </app-navbar>
 
   <main class="main-content">
-    <app-session-list [sessions]="upcomingSessions"></app-session-list>
+    <!-- No Group Selected State -->
+    <div *ngIf="!hasSelectedGroup()" class="no-group-state">
+      <div class="no-group-card">
+        <h2>📋 No Group Selected</h2>
+        <p>You need to select a group to view upcoming sessions.</p>
+        <a routerLink="/groups" class="btn btn-primary">
+          Manage Groups
+        </a>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="hasSelectedGroup() && isLoadingSessions" class="loading-state">
+      <div class="spinner"></div>
+      <span>Loading sessions...</span>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="hasSelectedGroup() && errorMessage" class="error-state">
+      <div class="error-card">
+        <h3>⚠️ Error Loading Sessions</h3>
+        <p>{{ errorMessage }}</p>
+        <button (click)="retryLoadingSessions()" class="btn btn-secondary">
+          Retry
+        </button>
+      </div>
+    </div>
+
+    <!-- Sessions List -->
+    <div *ngIf="hasSelectedGroup() && !isLoadingSessions && !errorMessage">
+      <!-- Empty Sessions State -->
+      <div *ngIf="upcomingSessions.length === 0" class="empty-sessions-state">
+        <div class="empty-sessions-card">
+          <h3>📅 No Upcoming Sessions</h3>
+          <p>There are no scheduled sessions for <strong>{{ getSelectedGroupName() }}</strong>.</p>
+          <p>Check back later or ask your group host to schedule a session!</p>
+        </div>
+      </div>
+      
+      <!-- Sessions List Component -->
+      <app-session-list 
+        *ngIf="upcomingSessions.length > 0" 
+        [sessions]="upcomingSessions">
+      </app-session-list>
+    </div>
   </main>
 
   <footer class="footer">

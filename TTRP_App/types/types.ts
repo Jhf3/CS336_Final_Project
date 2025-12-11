@@ -27,6 +27,25 @@ export interface GroupMember {
   isHost: boolean;
 }
 
+// Session-related sub-interfaces
+export interface SessionSnack {
+  userId: string;
+  userName: string;
+  snackDescription: string;
+}
+
+export interface SessionPassenger {
+  userId: string;
+  userName: string;
+}
+
+export interface SessionCarpool {
+  driverId: string;
+  driverName: string;
+  capacity: number;
+  passengers: SessionPassenger[];
+}
+
 // Session-related interfaces
 export interface Session {
   id: string;  // Document ID in Firestore
@@ -37,6 +56,9 @@ export interface Session {
   isConfirmed: boolean;
   sessionDate: Timestamp;
   hostNotes: string;
+  availableUsers: string[];  // Array of user IDs who confirmed availability
+  snacks: SessionSnack[];  // Array of snack contributions
+  carpool: SessionCarpool[];  // Array of carpool arrangements
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -56,6 +78,9 @@ export interface CreateSessionRequest {
   sessionDate: Timestamp;
   hostNotes?: string;
   isConfirmed?: boolean;
+  availableUsers?: string[];
+  snacks?: SessionSnack[];
+  carpool?: SessionCarpool[];
 }
 
 export interface UpdateSessionRequest {
@@ -63,6 +88,36 @@ export interface UpdateSessionRequest {
   isConfirmed?: boolean;
   sessionDate?: Timestamp;
   hostNotes?: string;
+  availableUsers?: string[];
+  snacks?: SessionSnack[];
+  carpool?: SessionCarpool[];
+}
+
+// New request interfaces for session management
+export interface ConfirmAvailabilityRequest {
+  sessionId: string;
+  userId: string;
+}
+
+export interface AddSnackRequest {
+  sessionId: string;
+  userId: string;
+  userName: string;
+  snackDescription: string;
+}
+
+export interface AddCarpoolRequest {
+  sessionId: string;
+  driverId: string;
+  driverName: string;
+  capacity: number;
+}
+
+export interface JoinCarpoolRequest {
+  sessionId: string;
+  driverId: string;
+  passengerId: string;
+  passengerName: string;
 }
 
 export interface JoinGroupRequest {

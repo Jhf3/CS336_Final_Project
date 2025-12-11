@@ -25,11 +25,18 @@ import {
   Group,
   Session,
   GroupMember,
+  SessionSnack,
+  SessionCarpool,
+  SessionPassenger,
   CreateUserRequest,
   CreateGroupRequest,
   CreateSessionRequest,
   UpdateSessionRequest,
   JoinGroupRequest,
+  ConfirmAvailabilityRequest,
+  AddSnackRequest,
+  AddCarpoolRequest,
+  JoinCarpoolRequest,
   GroupWithMembers,
   GroupWithSessions,
   UserWithGroups,
@@ -370,6 +377,9 @@ export class DatabaseService {
         isConfirmed: request.isConfirmed ?? false,
         sessionDate: request.sessionDate,
         hostNotes: request.hostNotes ?? '',
+        availableUsers: request.availableUsers ?? [],
+        snacks: request.snacks ?? [],
+        carpool: request.carpool ?? [],
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
       };
@@ -418,14 +428,35 @@ export class DatabaseService {
   }
 
   /**
+   * Get a single session by ID
+   */
+  async getSessionById(sessionId: string): Promise<DatabaseResult<Session>> {
+    try {
+      const sessionRef = doc(this.sessionsCollection, sessionId);
+      const sessionDoc = await getDoc(sessionRef);
+
+      if (!sessionDoc.exists()) {
+        return {
+          success: false,
+          error: { code: 'session-not-found', message: 'Session not found' }
+        };
+      }
+
+      const session: Session = { id: sessionDoc.id, ...sessionDoc.data() } as Session;
+      return { success: true, data: session };
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
    * Get sessions for a group
    */
   async getGroupSessions(groupId: string): Promise<DatabaseResult<Session[]>> {
     try {
       const q = query(
         this.sessionsCollection, 
-        where('groupId', '==', groupId),
-        orderBy('sessionDate', 'desc')
+        where('groupId', '==', groupId)
       );
       const querySnapshot = await getDocs(q);
 
@@ -433,6 +464,9 @@ export class DatabaseService {
       querySnapshot.forEach((doc) => {
         sessions.push({ id: doc.id, ...doc.data() } as Session);
       });
+
+      // Sort sessions by date descending (client-side)
+      sessions.sort((a, b) => b.sessionDate.toDate().getTime() - a.sessionDate.toDate().getTime());
 
       return { success: true, data: sessions };
     } catch (error) {
@@ -552,10 +586,13 @@ export class DatabaseService {
   getGroupSessionsStream(groupId: string): Observable<Session[]> {
     const q = query(
       this.sessionsCollection,
-      where('groupId', '==', groupId),
-      orderBy('sessionDate', 'desc')
+      where('groupId', '==', groupId)
     );
-    return collectionData(q, { idField: 'id' }) as Observable<Session[]>;
+    return collectionData(q, { idField: 'id' }).pipe(
+      map((sessions: any[]) => sessions.sort((a, b) => 
+        b.sessionDate.toDate().getTime() - a.sessionDate.toDate().getTime()
+      ))
+    ) as Observable<Session[]>;
   }
 
   /**
@@ -565,5 +602,219 @@ export class DatabaseService {
     return from(this.getGroupWithMembers(groupId)).pipe(
       map(result => result.success ? result.data.members : [])
     );
+  }
+
+  // ==================== SESSION MANAGEMENT OPERATIONS ====================
+
+  /**
+   * Confirm user availability for a session
+   */
+  async confirmAvailability(request: ConfirmAvailabilityRequest): Promise<DatabaseResult<void>> {
+    try {
+      const sessionResult = await this.getSessionById(request.sessionId);
+      if (!sessionResult.success) return sessionResult;
+
+      const session = sessionResult.data;
+      
+      // Add user to available users if not already present
+      if (!session.availableUsers.includes(request.userId)) {
+        const updatedUsers = [...session.availableUsers, request.userId];
+        
+        const sessionRef = doc(this.sessionsCollection, request.sessionId);
+        await updateDoc(sessionRef, {
+          availableUsers: updatedUsers,
+          updatedAt: Timestamp.now()
+        });
+      }
+
+      return { success: true, data: undefined };
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Remove user availability for a session
+   */
+  async removeAvailability(sessionId: string, userId: string): Promise<DatabaseResult<void>> {
+    try {
+      const sessionResult = await this.getSessionById(sessionId);
+      if (!sessionResult.success) return sessionResult;
+
+      const session = sessionResult.data;
+      const updatedUsers = session.availableUsers.filter((id: string) => id !== userId);
+      
+      const sessionRef = doc(this.sessionsCollection, sessionId);
+      await updateDoc(sessionRef, {
+        availableUsers: updatedUsers,
+        updatedAt: Timestamp.now()
+      });
+
+      return { success: true, data: undefined };
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Add snack contribution to a session
+   */
+  async addSnack(request: AddSnackRequest): Promise<DatabaseResult<void>> {
+    try {
+      const sessionResult = await this.getSessionById(request.sessionId);
+      if (!sessionResult.success) return sessionResult;
+
+      const session = sessionResult.data;
+      
+      // Remove existing snack from this user if any, then add new one
+      const updatedSnacks = session.snacks.filter((snack: SessionSnack) => snack.userId !== request.userId);
+      updatedSnacks.push({
+        userId: request.userId,
+        userName: request.userName,
+        snackDescription: request.snackDescription
+      });
+      
+      const sessionRef = doc(this.sessionsCollection, request.sessionId);
+      await updateDoc(sessionRef, {
+        snacks: updatedSnacks,
+        updatedAt: Timestamp.now()
+      });
+
+      return { success: true, data: undefined };
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Remove snack contribution from a session
+   */
+  async removeSnack(sessionId: string, userId: string): Promise<DatabaseResult<void>> {
+    try {
+      const sessionResult = await this.getSessionById(sessionId);
+      if (!sessionResult.success) return sessionResult;
+
+      const session = sessionResult.data;
+      const updatedSnacks = session.snacks.filter((snack: SessionSnack) => snack.userId !== userId);
+      
+      const sessionRef = doc(this.sessionsCollection, sessionId);
+      await updateDoc(sessionRef, {
+        snacks: updatedSnacks,
+        updatedAt: Timestamp.now()
+      });
+
+      return { success: true, data: undefined };
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Add carpool offer to a session
+   */
+  async addCarpool(request: AddCarpoolRequest): Promise<DatabaseResult<void>> {
+    try {
+      const sessionResult = await this.getSessionById(request.sessionId);
+      if (!sessionResult.success) return sessionResult;
+
+      const session = sessionResult.data;
+      
+      // Remove existing carpool from this driver if any, then add new one
+      const updatedCarpool = session.carpool.filter((car: SessionCarpool) => car.driverId !== request.driverId);
+      updatedCarpool.push({
+        driverId: request.driverId,
+        driverName: request.driverName,
+        capacity: request.capacity,
+        passengers: []
+      });
+      
+      const sessionRef = doc(this.sessionsCollection, request.sessionId);
+      await updateDoc(sessionRef, {
+        carpool: updatedCarpool,
+        updatedAt: Timestamp.now()
+      });
+
+      return { success: true, data: undefined };
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Join a carpool for a session
+   */
+  async joinCarpool(request: JoinCarpoolRequest): Promise<DatabaseResult<void>> {
+    try {
+      const sessionResult = await this.getSessionById(request.sessionId);
+      if (!sessionResult.success) return sessionResult;
+
+      const session = sessionResult.data;
+      
+      // Find the carpool and add passenger if there's capacity
+      const updatedCarpool = session.carpool.map((car: SessionCarpool) => {
+        if (car.driverId === request.driverId) {
+          // Remove passenger from any existing carpool first
+          const cleanedPassengers = car.passengers.filter((p: SessionPassenger) => p.userId !== request.passengerId);
+          
+          // Check capacity
+          if (cleanedPassengers.length >= car.capacity) {
+            throw new Error('Carpool is at full capacity');
+          }
+          
+          return {
+            ...car,
+            passengers: [...cleanedPassengers, {
+              userId: request.passengerId,
+              userName: request.passengerName
+            }]
+          };
+        }
+        // Remove passenger from other carpools
+        return {
+          ...car,
+          passengers: car.passengers.filter((p: SessionPassenger) => p.userId !== request.passengerId)
+        };
+      });
+      
+      const sessionRef = doc(this.sessionsCollection, request.sessionId);
+      await updateDoc(sessionRef, {
+        carpool: updatedCarpool,
+        updatedAt: Timestamp.now()
+      });
+
+      return { success: true, data: undefined };
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  /**
+   * Leave all carpools for a session
+   */
+  async leaveCarpool(sessionId: string, userId: string): Promise<DatabaseResult<void>> {
+    try {
+      const sessionResult = await this.getSessionById(sessionId);
+      if (!sessionResult.success) return sessionResult;
+
+      const session = sessionResult.data;
+      
+      // Remove user from all carpools as passenger, or remove entire carpool if they're the driver
+      const updatedCarpool = session.carpool
+        .filter((car: SessionCarpool) => car.driverId !== userId) // Remove if user is driver
+        .map((car: SessionCarpool) => ({
+          ...car,
+          passengers: car.passengers.filter((p: SessionPassenger) => p.userId !== userId) // Remove as passenger
+        }));
+      
+      const sessionRef = doc(this.sessionsCollection, sessionId);
+      await updateDoc(sessionRef, {
+        carpool: updatedCarpool,
+        updatedAt: Timestamp.now()
+      });
+
+      return { success: true, data: undefined };
+    } catch (error) {
+      return this.handleError(error);
+    }
   }
 }

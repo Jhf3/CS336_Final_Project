@@ -48,6 +48,9 @@
         "isConfirmed": "boolean",
         "sessionDate": "Timestamp",
         "hostNotes": "string",
+        "availableUsers": "array<string> (user IDs who confirmed availability)",
+        "snacks": "array<object> { userId: string, userName: string, snackDescription: string }",
+        "carpool": "array<object> { driverId: string, driverName: string, capacity: number, passengers: array<{userId: string, userName: string}> }",
         "createdAt": "Timestamp",
         "updatedAt": "Timestamp"
       },
@@ -60,6 +63,21 @@
         "isConfirmed": true,
         "sessionDate": "2024-01-20T19:00:00Z",
         "hostNotes": "Remember to bring character sheets. We'll be exploring the haunted castle.",
+        "availableUsers": ["user_12345", "user_67890", "user_11111"],
+        "snacks": [
+          { "userId": "user_67890", "userName": "jane_smith", "snackDescription": "Pizza and soda" },
+          { "userId": "user_11111", "userName": "mike_wizard", "snackDescription": "Chips and dip" }
+        ],
+        "carpool": [
+          {
+            "driverId": "user_12345",
+            "driverName": "john_doe",
+            "capacity": 3,
+            "passengers": [
+              { "userId": "user_67890", "userName": "jane_smith" }
+            ]
+          }
+        ],
         "createdAt": "2024-01-15T00:00:00Z",
         "updatedAt": "2024-01-18T00:00:00Z"
       }

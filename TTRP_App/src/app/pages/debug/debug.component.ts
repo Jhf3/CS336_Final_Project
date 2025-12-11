@@ -8,7 +8,12 @@ import {
   Session, 
   CreateUserRequest, 
   CreateGroupRequest, 
-  CreateSessionRequest, 
+  CreateSessionRequest,
+  ConfirmAvailabilityRequest,
+  AddSnackRequest,
+  AddCarpoolRequest,
+  SessionSnack,
+  SessionCarpool
 } from '../../../../types/types';
 import { Timestamp } from '@angular/fire/firestore';
 import { Navbar, NavButton } from '../../components/navbar/navbar';
@@ -179,6 +184,98 @@ export class DebugComponent implements OnInit {
       this.loading = false;
     }
   }
+
+  // Session Management Operations
+  async testAvailability() {
+    if (!this.currentUser || this.allSessions.length === 0) {
+      this.addMessage('❌ Please create a user and session first');
+      return;
+    }
+    
+    this.loading = true;
+    try {
+      const session = this.allSessions[0];
+      
+      // Test confirm availability
+      const confirmRequest: ConfirmAvailabilityRequest = {
+        sessionId: session.id,
+        userId: this.currentUser.id
+      };
+      
+      const confirmResult = await this.dbService.confirmAvailability(confirmRequest);
+      if (await this.handleResult('Confirm Availability', confirmResult)) {
+        this.addMessage(`✅ ${this.currentUser.username} confirmed availability for session`);
+        
+        // Test remove availability
+        const removeResult = await this.dbService.removeAvailability(session.id, this.currentUser.id);
+        await this.handleResult('Remove Availability', removeResult);
+      }
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async testSnackContribution() {
+    if (!this.currentUser || this.allSessions.length === 0) {
+      this.addMessage('❌ Please create a user and session first');
+      return;
+    }
+    
+    this.loading = true;
+    try {
+      const session = this.allSessions[0];
+      
+      // Test add snack
+      const snackRequest: AddSnackRequest = {
+        sessionId: session.id,
+        userId: this.currentUser.id,
+        userName: this.currentUser.username,
+        snackDescription: 'Test snacks: chips and dip (no nuts)'
+      };
+      
+      const addResult = await this.dbService.addSnack(snackRequest);
+      if (await this.handleResult('Add Snack', addResult)) {
+        this.addMessage(`✅ ${this.currentUser.username} added snack contribution`);
+        
+        // Test remove snack
+        const removeResult = await this.dbService.removeSnack(session.id, this.currentUser.id);
+        await this.handleResult('Remove Snack', removeResult);
+      }
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async testCarpoolManagement() {
+    if (!this.currentUser || this.allSessions.length === 0) {
+      this.addMessage('❌ Please create a user and session first');
+      return;
+    }
+    
+    this.loading = true;
+    try {
+      const session = this.allSessions[0];
+      
+      // Test add carpool offer
+      const carpoolRequest: AddCarpoolRequest = {
+        sessionId: session.id,
+        driverId: this.currentUser.id,
+        driverName: this.currentUser.username,
+        capacity: 3
+      };
+      
+      const addResult = await this.dbService.addCarpool(carpoolRequest);
+      if (await this.handleResult('Add Carpool', addResult)) {
+        this.addMessage(`✅ ${this.currentUser.username} offered carpool (capacity: 3)`);
+        
+        // Test leave carpool (remove offer)
+        const leaveResult = await this.dbService.leaveCarpool(session.id, this.currentUser.id);
+        await this.handleResult('Leave Carpool', leaveResult);
+      }
+    } finally {
+      this.loading = false;
+    }
+  }
   
   // Utility Operations
   async testCompleteFlow() {
@@ -198,6 +295,36 @@ export class DebugComponent implements OnInit {
   }
   
   async populateSampleData() {
+    /* 
+     * SAMPLE DATA OVERVIEW:
+     * This function populates the Firebase database with realistic sample data for testing.
+     * 
+     * USERS (5 total):
+     * - john_doe, jane_smith, mike_wizard, sarah_rogue, alex_fighter
+     * - Each user gets auto-generated ID, username, creation timestamp, and empty groupIds array
+     * 
+     * GROUPS (3 total):
+     * - "Weekly D&D Campaign" (hosted by john_doe) - Fantasy RPG with 3-4 members
+     * - "Pathfinder Society" (hosted by jane_smith) - Organized play with 3-4 members  
+     * - "Call of Cthulhu Mystery" (hosted by mike_wizard) - Horror investigation with 3-4 members
+     * - Each group gets host, members, creation/update timestamps, and denormalized host name
+     * 
+     * SESSIONS (4 total):
+     * - Spread across next 3 weeks with realistic dates
+     * - Session 1: Character creation (3 days from now, confirmed)
+     * - Session 2: Castle exploration (1 week from now, confirmed) 
+     * - Session 3: Boss fight (2 weeks from now, unconfirmed)
+     * - Session 4: City intrigue (3 weeks from now, unconfirmed)
+     * - Each session includes group reference, host info, notes, confirmation status
+     * - Sessions include sample availability confirmations (2-3 users per session)
+     * - Sample snack contributions (pizza, cookies with dietary info)
+     * - Sample carpool arrangements (driver offers with passenger capacity)
+     * 
+     * RELATIONSHIPS:
+     * - Users are automatically added to multiple groups as members
+     * - Groups maintain memberIds arrays and hosts can't leave their own groups
+     * - Sessions reference their parent groups and include denormalized data for performance
+     */
     this.loading = true;
     this.addMessage('🌱 Starting sample data population...');
     
@@ -314,16 +441,54 @@ export class DebugComponent implements OnInit {
           const notes = sessionNotes[i];
           
           try {
+            // Create sample availability (2-3 users confirmed for each session)
+            const availableUserIds = createdUsers
+              .slice(0, 2 + Math.floor(Math.random() * 2))
+              .map(user => user.id);
+
+            // Create sample snack contributions
+            const sampleSnacks: SessionSnack[] = [
+              {
+                userId: createdUsers[0]?.id || '',
+                userName: createdUsers[0]?.username || '',
+                snackDescription: 'Pizza and sodas for everyone'
+              },
+              {
+                userId: createdUsers[1]?.id || '',
+                userName: createdUsers[1]?.username || '', 
+                snackDescription: 'Homemade cookies (gluten-free options available)'
+              }
+            ].filter(snack => snack.userId && availableUserIds.includes(snack.userId));
+
+            // Create sample carpool offers
+            const sampleCarpool: SessionCarpool[] = [
+              {
+                driverId: createdUsers[0]?.id || '',
+                driverName: createdUsers[0]?.username || '',
+                capacity: 3,
+                passengers: createdUsers.length > 2 ? [
+                  {
+                    userId: createdUsers[2].id,
+                    userName: createdUsers[2].username
+                  }
+                ] : []
+              }
+            ].filter(carpool => carpool.driverId && availableUserIds.includes(carpool.driverId));
+            
             const sessionRequest: CreateSessionRequest = {
               groupId: group.id,
               sessionDate: Timestamp.fromDate(sessionDate),
               hostNotes: notes,
-              isConfirmed: i < 2 // First 2 sessions are confirmed
+              isConfirmed: i < 2, // First 2 sessions are confirmed
+              availableUsers: availableUserIds,
+              snacks: sampleSnacks,
+              carpool: sampleCarpool
             };
             
             const result = await this.dbService.createSession(sessionRequest);
             if (result.success && result.data) {
               this.addMessage(`✅ Created session for ${group.name} on ${sessionDate.toLocaleDateString()}`);
+              this.addMessage(`   📅 ${availableUserIds.length} users available, ${sampleSnacks.length} snacks, ${sampleCarpool.length} carpool offers`);
             }
           } catch (error) {
             this.addMessage(`⚠️ Error creating session for ${group.name}: ${error}`);

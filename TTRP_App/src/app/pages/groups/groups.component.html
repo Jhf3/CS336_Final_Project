@@ -48,12 +48,18 @@
       <div class="groups-section">
         <h2>My Groups</h2>
         
-        <div *ngIf="userGroups.length === 0" class="empty-state">
+        <!-- Loading State -->
+        <div *ngIf="isLoadingGroups" class="loading-state">
+          <div class="spinner"></div>
+          <span>Loading your groups...</span>
+        </div>
+        
+        <div *ngIf="!isLoadingGroups && userGroups.length === 0" class="empty-state">
           <p>You haven't joined any groups yet.</p>
           <p>Create a new group or join an existing one to get started!</p>
         </div>
 
-        <div *ngIf="userGroups.length > 0" class="groups-list">
+        <div *ngIf="!isLoadingGroups && userGroups.length > 0" class="groups-list">
           <div *ngFor="let group of userGroups" class="group-card">
             <div class="group-info">
               <h3>{{ group.name }}</h3>

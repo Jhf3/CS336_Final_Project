@@ -114,6 +114,35 @@
       </div>
 
       <div class="action-group">
+        <h3>Session Management</h3>
+        <div class="button-group">
+          <button 
+            (click)="testAvailability()" 
+            [disabled]="loading || !currentUser || allSessions.length === 0"
+            class="btn btn-secondary"
+          >
+            📅 Test Availability
+          </button>
+          
+          <button 
+            (click)="testSnackContribution()" 
+            [disabled]="loading || !currentUser || allSessions.length === 0"
+            class="btn btn-secondary"
+          >
+            🍕 Test Snacks
+          </button>
+          
+          <button 
+            (click)="testCarpoolManagement()" 
+            [disabled]="loading || !currentUser || allSessions.length === 0"
+            class="btn btn-secondary"
+          >
+            🚗 Test Carpool
+          </button>
+        </div>
+      </div>
+
+      <div class="action-group">
         <h3>Complete Tests</h3>
         <div class="button-group">
           <button 
@@ -202,6 +231,9 @@
                   <th>Date</th>
                   <th>Confirmed</th>
                   <th>Group</th>
+                  <th>Available</th>
+                  <th>Snacks</th>
+                  <th>Carpool</th>
                   <th>Notes</th>
                 </tr>
               </thead>
@@ -214,6 +246,15 @@
                     </span>
                   </td>
                   <td>{{ session.groupName }}</td>
+                  <td class="count-cell">
+                    <span class="count-badge">{{ session.availableUsers.length || 0 }}</span>
+                  </td>
+                  <td class="count-cell">
+                    <span class="count-badge">{{ session.snacks.length || 0 }}</span>
+                  </td>
+                  <td class="count-cell">
+                    <span class="count-badge">{{ session.carpool.length || 0 }}</span>
+                  </td>
                   <td class="notes-cell">{{ session.hostNotes || 'No notes' }}</td>
                 </tr>
               </tbody>
