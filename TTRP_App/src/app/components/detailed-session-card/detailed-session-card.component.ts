@@ -1,9 +1,9 @@
-import { Component, Input, PLATFORM_ID, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NoteCardComponent } from '../note-card/note-card.component';
 import { SecretNoteCardComponent } from '../secret-note-card/secret-note-card.component';
-import { Session, User } from '../../../../types/types';
+import { Session, User, UpdateSessionRequest } from '../../../../types/types';
 import { DatabaseService } from '../../services/database-service';
 
 @Component({
@@ -23,12 +23,17 @@ export class DetailedSessionCardComponent {
   @Input() secretNotes: string = '';
   @Input() isDM: boolean = false;
   @Input() currentUser: User | null = null;
+  @Output() sessionUpdated = new EventEmitter<Session>();
 
   // Form inputs
   snackInput: string = '';
   carpoolInput: string = '';
   carpoolCapacity: number = 4;
   isProcessing: boolean = false;
+  
+  // Session confirmation state
+  isUpdatingSession: boolean = false;
+  updateError: string = '';
 
   // Host editing states
   isEditingHostNotes: boolean = false;
@@ -413,5 +418,55 @@ export class DetailedSessionCardComponent {
     } finally {
       this.isProcessing = false;
     }
+  }
+  
+  // ==================== SESSION CONFIRMATION METHODS ====================
+  
+  async toggleSessionConfirmation() {
+    if (!this.isDM || this.isUpdatingSession) {
+      return;
+    }
+    
+    this.isUpdatingSession = true;
+    this.updateError = '';
+    
+    try {
+      const updateRequest: UpdateSessionRequest = {
+        sessionId: this.session.id,
+        isConfirmed: !this.session.isConfirmed
+      };
+      
+      console.log('Updating session confirmation:', updateRequest);
+      
+      const result = await this.dbService.updateSession(updateRequest);
+      
+      if (result.success) {
+        console.log('Session confirmation updated successfully:', result.data);
+        // Update local session data
+        this.session = { ...this.session, isConfirmed: result.data.isConfirmed };
+        // Emit the updated session to parent components
+        this.sessionUpdated.emit(this.session);
+        this.updateError = '';
+      } else {
+        console.error('Failed to update session confirmation:', result.error);
+        this.updateError = result.error.message || 'Failed to update session. Please try again.';
+      }
+    } catch (error) {
+      console.error('Error updating session confirmation:', error);
+      this.updateError = 'An error occurred while updating the session. Please try again.';
+    } finally {
+      this.isUpdatingSession = false;
+    }
+  }
+  
+  get confirmButtonText(): string {
+    if (this.isUpdatingSession) {
+      return this.session.isConfirmed ? 'Unconfirming...' : 'Confirming...';
+    }
+    return this.session.isConfirmed ? 'Unconfirm' : 'Confirm';
+  }
+  
+  get confirmButtonClass(): string {
+    return this.session.isConfirmed ? 'btn-warning' : 'btn-success';
   }
 }

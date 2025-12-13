@@ -4,9 +4,25 @@
     <p class="session-info">
       <strong>{{ session.groupName }}</strong> hosted by {{ session.hostName }}
     </p>
-    <p class="session-status" [class.confirmed]="session.isConfirmed">
-      {{ session.isConfirmed ? 'Confirmed' : 'Tentative' }}
-    </p>
+    <div class="session-status-container">
+      <p class="session-status" [class.confirmed]="session.isConfirmed">
+        {{ session.isConfirmed ? 'Confirmed' : 'Tentative' }}
+      </p>
+      @if (isDM) {
+        <button 
+          class="confirm-toggle-btn" 
+          [ngClass]="confirmButtonClass"
+          (click)="toggleSessionConfirmation()"
+          [disabled]="isUpdatingSession">
+          {{ confirmButtonText }}
+        </button>
+      }
+    </div>
+    @if (updateError && isDM) {
+      <div class="error-message-inline">
+        {{ updateError }}
+      </div>
+    }
   </div>
 
   <div class="session-details">

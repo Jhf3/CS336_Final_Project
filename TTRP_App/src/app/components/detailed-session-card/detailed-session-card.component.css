@@ -406,4 +406,69 @@
   .btn {
     width: 100%;
   }
+  
+  .session-status-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .confirm-toggle-btn {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+}
+
+/* Session Status Container and Confirmation Button */
+.session-status-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.confirm-toggle-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.confirm-toggle-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--success) 0%, #38a169 100%);
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+  transform: translateY(-1px);
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, var(--warning) 0%, #dd6b20 100%);
+  color: white;
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dd6b20 0%, #c05621 100%);
+  transform: translateY(-1px);
+}
+
+.error-message-inline {
+  background-color: #fed7d7;
+  color: #c53030;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+  font-size: 0.9rem;
+  border: 1px solid #f5c6cb;
 }

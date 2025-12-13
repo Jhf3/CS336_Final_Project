@@ -2,7 +2,8 @@
   <div class="session-list">
     @for (session of sessions; track session.id) {
       <app-session-card 
-        [session]="session">
+        [session]="session"
+        (sessionUpdated)="onSessionUpdated($event)">
       </app-session-card>
     }
     @empty {
