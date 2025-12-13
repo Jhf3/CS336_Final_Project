@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SessionCardComponent } from '../session-card/session-card.component';
 import { Session } from '../../../../types/types';
@@ -11,4 +11,10 @@ import { Session } from '../../../../types/types';
 })
 export class SessionListComponent {
   @Input() sessions: Session[] = [];
+  @Output() sessionUpdated = new EventEmitter<Session>();
+  
+  onSessionUpdated(updatedSession: Session) {
+    // Emit the updated session to parent component
+    this.sessionUpdated.emit(updatedSession);
+  }
 }

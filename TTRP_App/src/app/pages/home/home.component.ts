@@ -325,4 +325,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow.toISOString().split('T')[0];
   }
+  
+  /**
+   * Handle session updates from child components
+   */
+  onSessionUpdated(updatedSession: Session) {
+    // Update the session in the local array
+    const index = this.upcomingSessions.findIndex(s => s.id === updatedSession.id);
+    if (index !== -1) {
+      this.upcomingSessions[index] = updatedSession;
+      console.log('Session updated in home component:', updatedSession);
+    }
+  }
 }

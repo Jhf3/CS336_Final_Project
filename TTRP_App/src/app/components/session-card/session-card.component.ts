@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, PLATFORM_ID, inject, OnInit } f
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { DetailedSessionCardComponent } from '../detailed-session-card/detailed-session-card.component';
 import { Session, User } from '../../../../types/types';
+import { DatabaseService } from '../../services/database-service';
 
 @Component({
   selector: 'app-session-card',
@@ -13,9 +14,12 @@ export class SessionCardComponent implements OnInit {
   private platformId = inject(PLATFORM_ID);
   
   @Input() session!: Session;
+  @Output() sessionUpdated = new EventEmitter<Session>();
   
   showModal = false;
   currentUser: User | null = null;
+  
+  constructor(private dbService: DatabaseService) {}
 
   get isDM(): boolean {
     if (!this.currentUser) return false;
@@ -98,5 +102,12 @@ export class SessionCardComponent implements OnInit {
   
   closeModal() {
     this.showModal = false;
+  }
+  
+  onSessionUpdated(updatedSession: Session) {
+    // Update local session data
+    this.session = updatedSession;
+    // Emit to parent component
+    this.sessionUpdated.emit(updatedSession);
   }
 }
