@@ -1,45 +1,48 @@
 .session-card {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 16px;
+  border: 2px solid var(--border-purple);
+  border-radius: 12px;
+  padding: 20px;
   margin: 8px;
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: white;
+  box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
 }
 
 .session-card:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+  border-color: var(--primary-purple);
 }
 
 .session-date {
-  border-bottom: 2px solid #e0e0e0;
-  padding-bottom: 8px;
+  background: var(--gradient-light);
+  border-radius: 8px;
+  padding: 12px;
   margin-bottom: 12px;
 }
 
 .session-date h3 {
   margin: 0;
-  color: #333;
+  color: var(--primary-purple);
   font-size: 1.2em;
+  font-weight: 600;
 }
 
 .session-status {
   display: inline-block;
-  padding: 4px 8px;
+  padding: 4px 12px;
   border-radius: 12px;
   font-size: 0.75em;
-  font-weight: 500;
+  font-weight: 600;
   margin-top: 4px;
-  background-color: #ffc107;
-  color: #212529;
+  background: linear-gradient(135deg, var(--warning) 0%, #dd6b20 100%);
+  color: white;
 }
 
 .session-status.confirmed {
-  background-color: #28a745;
+  background: linear-gradient(135deg, var(--success) 0%, #38a169 100%);
   color: white;
 }
 
@@ -78,9 +81,10 @@
 .click-hint {
   text-align: center;
   font-size: 0.85em;
-  color: #4a90e2;
+  color: var(--primary-blue);
   margin-top: 8px;
   font-style: italic;
+  font-weight: 500;
 }
 
 .modal-overlay {
@@ -89,7 +93,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(107, 70, 193, 0.15);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -109,7 +114,7 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  background: #f44336;
+  background: linear-gradient(135deg, var(--error) 0%, #e53e3e 100%);
   color: white;
   border: none;
   border-radius: 50%;
@@ -121,12 +126,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.3s ease;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
 }
 
 .close-button:hover {
-  background: #d32f2f;
+  transform: scale(1.1);
+  box-shadow: var(--shadow-lg);
 }
 
 @keyframes fadeIn {
