@@ -119,6 +119,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
     }
     
     this.isCreatingGroup = true;
+    this.cdr.detectChanges(); // Force change detection when starting creation
     this.errorMessage = '';
     this.successMessage = '';
     
@@ -148,6 +149,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
       this.errorMessage = 'An error occurred while creating the group';
     } finally {
       this.isCreatingGroup = false;
+      this.cdr.detectChanges(); // Force change detection when ending creation
     }
   }
   
@@ -155,6 +157,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
     if (!this.currentUser) return;
     
     this.isJoiningGroup = true;
+    this.cdr.detectChanges(); // Force change detection when starting join
     this.errorMessage = '';
     this.successMessage = '';
     
@@ -180,6 +183,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
       this.errorMessage = 'An error occurred while joining the group';
     } finally {
       this.isJoiningGroup = false;
+      this.cdr.detectChanges(); // Force change detection when ending join
     }
   }
   
@@ -187,6 +191,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
     if (!this.currentUser || !confirm('Are you sure you want to leave this group?')) return;
     
     this.isLoading = true;
+    this.cdr.detectChanges(); // Force change detection when starting leave
     this.errorMessage = '';
     this.successMessage = '';
     
@@ -206,6 +211,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
       this.errorMessage = 'An error occurred while leaving the group';
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges(); // Force change detection when ending leave
     }
   }
   

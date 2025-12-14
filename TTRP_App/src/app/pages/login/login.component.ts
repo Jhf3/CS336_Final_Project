@@ -1,4 +1,4 @@
-import { Component, PLATFORM_ID, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
@@ -12,7 +12,7 @@ import { User } from '../../../../types/types';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private platformId = inject(PLATFORM_ID);
   username: string = '';
   isLoading: boolean = false;
@@ -21,8 +21,24 @@ export class LoginComponent {
   
   constructor(
     private dbService: DatabaseService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
+  
+  ngOnInit() {
+    // Check if user is already logged in
+    if (isPlatformBrowser(this.platformId)) {
+      const storedUser = localStorage.getItem('currentUser');
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      
+      if (storedUser && isLoggedIn === 'true') {
+        // User is already logged in, redirect to home
+        console.log('User already logged in, redirecting to home');
+        this.router.navigate(['/home']);
+        return;
+      }
+    }
+  }
   
   async onLogin() {
     // Reset messages
@@ -35,6 +51,7 @@ export class LoginComponent {
     }
     
     this.isLoading = true;
+    this.cdr.detectChanges(); // Force change detection when starting load
     
     try {
       // Try to get existing user
@@ -65,6 +82,7 @@ export class LoginComponent {
       this.errorMessage = 'An error occurred during login. Please try again.';
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges(); // Force change detection when ending load
     }
   }
   
@@ -77,6 +95,7 @@ export class LoginComponent {
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
+    this.cdr.detectChanges(); // Force change detection when starting creation
     
     try {
       const createResult = await this.dbService.createUser({
@@ -106,6 +125,7 @@ export class LoginComponent {
       this.errorMessage = 'An error occurred while creating account. Please try again.';
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges(); // Force change detection when ending creation
     }
   }
   

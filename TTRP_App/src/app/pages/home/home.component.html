@@ -1,8 +1,9 @@
 <div class="home-container">
   <app-navbar 
-    [title]="hasSelectedGroup() ? getSelectedGroupName() : 'TTRP App'" 
+    [title]="hasSelectedGroup() ? getSelectedGroupName() : 'TTRPG App'" 
     [subtitle]="hasSelectedGroup() ? 'Upcoming sessions for your group' : 'Select a group to view sessions'"
-    [navigationButtons]="navigationButtons">
+    [navigationButtons]="navigationButtons"
+    [isLoggedIn]="!!currentUser">
   </app-navbar>
 
   <main class="main-content">

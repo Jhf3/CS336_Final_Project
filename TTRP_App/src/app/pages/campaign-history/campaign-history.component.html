@@ -2,7 +2,8 @@
     <app-navbar 
         title="Campaign History" 
         [subtitle]="hasSelectedGroup() ? 'All previous sessions for ' + getSelectedGroupName() : 'Select a group to view campaign history'"
-        [navigationButtons]="navigationButtons">
+        [navigationButtons]="navigationButtons"
+        [isLoggedIn]="!!currentUser">
     </app-navbar>
 
     <main class="main-content">

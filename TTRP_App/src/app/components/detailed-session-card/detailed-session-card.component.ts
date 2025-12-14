@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, PLATFORM_ID, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectorRef, PLATFORM_ID, inject, OnInit, OnChanges } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NoteCardComponent } from '../note-card/note-card.component';
@@ -12,7 +12,7 @@ import { DatabaseService } from '../../services/database-service';
   templateUrl: './detailed-session-card.component.html',
   styleUrl: './detailed-session-card.component.css'
 })
-export class DetailedSessionCardComponent {
+export class DetailedSessionCardComponent implements OnInit, OnChanges {
   private platformId = inject(PLATFORM_ID);
   
   @Input() session!: Session;
@@ -43,14 +43,85 @@ export class DetailedSessionCardComponent {
   secretNotesInput: string = '';
   externalAvailabilityInput: string = '';
 
-  constructor(private dbService: DatabaseService) {}
+  // Player names data
+  availablePlayerNames: string[] = [];
+  isLoadingPlayerNames: boolean = false;
+
+  constructor(
+    private dbService: DatabaseService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit() {
+    this.loadAvailablePlayerNames();
+  }
+
+  ngOnChanges() {
+    // Reload player names when session changes
+    this.loadAvailablePlayerNames();
+  }
+
+  /**
+   * Load the names of users who have confirmed availability
+   */
+  private async loadAvailablePlayerNames() {
+    if (!this.session?.availableUsers || this.session.availableUsers.length === 0) {
+      this.availablePlayerNames = [];
+      return;
+    }
+
+    this.isLoadingPlayerNames = true;
+    this.cdr.detectChanges();
+
+    try {
+      const userNames: string[] = [];
+      
+      // Get user data for each available user ID
+      for (const userId of this.session.availableUsers) {
+        try {
+          const userResult = await this.dbService.getUserById(userId);
+          if (userResult.success && userResult.data) {
+            userNames.push(userResult.data.username);
+          } else {
+            // If we can't find the user, show their ID as fallback
+            userNames.push(`User ${userId.substring(0, 8)}...`);
+          }
+        } catch (error) {
+          console.error(`Error loading user ${userId}:`, error);
+          userNames.push(`User ${userId.substring(0, 8)}...`);
+        }
+      }
+
+      this.availablePlayerNames = userNames;
+    } catch (error) {
+      console.error('Error loading available player names:', error);
+      this.availablePlayerNames = this.session.availableUsers.map(id => `User ${id.substring(0, 8)}...`);
+    } finally {
+      this.isLoadingPlayerNames = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  private setProcessing(isProcessing: boolean) {
+    this.isProcessing = isProcessing;
+    this.cdr.detectChanges();
+  }
+
+  private setUpdatingSession(isUpdating: boolean) {
+    this.isUpdatingSession = isUpdating;
+    this.cdr.detectChanges();
+  }
 
   get sessionDate(): Date {
     return this.session.sessionDate.toDate();
   }
 
   get availablePlayers(): string[] {
-    return this.session.availableUsers || [];
+    return this.availablePlayerNames;
+  }
+
+  get availablePlayersCount(): number {
+    return this.session.availableUsers?.length || 0;
   }
 
   get isPlayerAvailable(): boolean {
@@ -119,7 +190,7 @@ export class DetailedSessionCardComponent {
   async addPlayerToSession() {
     if (!this.currentUser || this.isProcessing || !this.isFutureSession) return;
     
-    this.isProcessing = true;
+    this.setProcessing(true);
     try {
       const result = await this.dbService.confirmAvailability({
         sessionId: this.session.id,
@@ -129,38 +200,44 @@ export class DetailedSessionCardComponent {
       if (!result.success) {
         console.error('Failed to add player:', result.error);
         alert('Failed to join session. Please try again.');
+      } else {
+        // Reload player names after successful join
+        this.loadAvailablePlayerNames();
       }
     } catch (error) {
       console.error('Error adding player:', error);
       alert('An error occurred. Please try again.');
     } finally {
-      this.isProcessing = false;
+      this.setProcessing(false);
     }
   }
 
   async removePlayerFromSession() {
     if (!this.currentUser || this.isProcessing || !this.isFutureSession) return;
     
-    this.isProcessing = true;
+    this.setProcessing(true);
     try {
       const result = await this.dbService.removeAvailability(this.session.id, this.currentUser.id);
       
       if (!result.success) {
         console.error('Failed to remove player:', result.error);
         alert('Failed to leave session. Please try again.');
+      } else {
+        // Reload player names after successful leave
+        this.loadAvailablePlayerNames();
       }
     } catch (error) {
       console.error('Error removing player:', error);
       alert('An error occurred. Please try again.');
     } finally {
-      this.isProcessing = false;
+      this.setProcessing(false);
     }
   }
 
   async addSnackInfo() {
     if (!this.currentUser || this.isProcessing || !this.snackInput.trim() || !this.isFutureSession) return;
     
-    this.isProcessing = true;
+    this.setProcessing(true);
     try {
       const result = await this.dbService.addSnack({
         sessionId: this.session.id,
@@ -179,7 +256,7 @@ export class DetailedSessionCardComponent {
       console.error('Error adding snack:', error);
       alert('An error occurred. Please try again.');
     } finally {
-      this.isProcessing = false;
+      this.setProcessing(false);
     }
   }
 
@@ -192,7 +269,7 @@ export class DetailedSessionCardComponent {
       return;
     }
     
-    this.isProcessing = true;
+    this.setProcessing(true);
     try {
       const result = await this.dbService.addCarpool({
         sessionId: this.session.id,
@@ -211,14 +288,14 @@ export class DetailedSessionCardComponent {
       console.error('Error adding carpool:', error);
       alert('An error occurred. Please try again.');
     } finally {
-      this.isProcessing = false;
+      this.setProcessing(false);
     }
   }
 
   async removeSnackInfo() {
     if (!this.currentUser || this.isProcessing || !this.isFutureSession) return;
     
-    this.isProcessing = true;
+    this.setProcessing(true);
     try {
       const result = await this.dbService.removeSnack(this.session.id, this.currentUser.id);
       
@@ -230,14 +307,14 @@ export class DetailedSessionCardComponent {
       console.error('Error removing snack:', error);
       alert('An error occurred. Please try again.');
     } finally {
-      this.isProcessing = false;
+      this.setProcessing(false);
     }
   }
 
   async removeCarpoolInfo() {
     if (!this.currentUser || this.isProcessing || !this.isFutureSession) return;
     
-    this.isProcessing = true;
+    this.setProcessing(true);
     try {
       const result = await this.dbService.leaveCarpool(this.session.id, this.currentUser.id);
       
@@ -249,7 +326,7 @@ export class DetailedSessionCardComponent {
       console.error('Error removing carpool:', error);
       alert('An error occurred. Please try again.');
     } finally {
-      this.isProcessing = false;
+      this.setProcessing(false);
     }
   }
 
@@ -262,7 +339,7 @@ export class DetailedSessionCardComponent {
       return;
     }
     
-    this.isProcessing = true;
+    this.setProcessing(true);
     try {
       // If user has an empty ride offer, remove it first
       if (this.hasUserCarpool && !this.userCarpoolHasPassengers) {
@@ -270,7 +347,7 @@ export class DetailedSessionCardComponent {
         if (!removeResult.success) {
           console.error('Failed to remove empty carpool:', removeResult.error);
           alert('Failed to remove your ride offer. Please try again.');
-          this.isProcessing = false;
+          this.setProcessing(false);
           return;
         }
       }
@@ -291,14 +368,14 @@ export class DetailedSessionCardComponent {
       console.error('Error joining carpool:', error);
       alert(error?.message || 'An error occurred. Please try again.');
     } finally {
-      this.isProcessing = false;
+      this.setProcessing(false);
     }
   }
 
   async leavePassengerCarpool() {
     if (!this.currentUser || this.isProcessing || !this.isFutureSession) return;
     
-    this.isProcessing = true;
+    this.setProcessing(true);
     try {
       const result = await this.dbService.leaveCarpool(this.session.id, this.currentUser.id);
       
@@ -310,7 +387,7 @@ export class DetailedSessionCardComponent {
       console.error('Error leaving carpool:', error);
       alert('An error occurred. Please try again.');
     } finally {
-      this.isProcessing = false;
+      this.setProcessing(false);
     }
   }
 
@@ -328,7 +405,7 @@ export class DetailedSessionCardComponent {
   async saveHostNotes() {
     if (!this.isHost || this.isProcessing) return;
     
-    this.isProcessing = true;
+    this.setProcessing(true);
     try {
       const result = await this.dbService.updateSession({
         sessionId: this.session.id,
@@ -346,7 +423,7 @@ export class DetailedSessionCardComponent {
       console.error('Error updating host notes:', error);
       alert('An error occurred. Please try again.');
     } finally {
-      this.isProcessing = false;
+      this.setProcessing(false);
     }
   }
 
@@ -363,7 +440,7 @@ export class DetailedSessionCardComponent {
   async saveSecretNotes() {
     if (!this.isHost || this.isProcessing) return;
     
-    this.isProcessing = true;
+    this.setProcessing(true);
     try {
       const result = await this.dbService.updateSession({
         sessionId: this.session.id,
@@ -381,7 +458,7 @@ export class DetailedSessionCardComponent {
       console.error('Error updating secret notes:', error);
       alert('An error occurred. Please try again.');
     } finally {
-      this.isProcessing = false;
+      this.setProcessing(false);
     }
   }
 
@@ -398,7 +475,7 @@ export class DetailedSessionCardComponent {
   async saveExternalAvailability() {
     if (!this.isHost || this.isProcessing) return;
     
-    this.isProcessing = true;
+    this.setProcessing(true);
     try {
       const result = await this.dbService.updateSession({
         sessionId: this.session.id,
@@ -416,7 +493,7 @@ export class DetailedSessionCardComponent {
       console.error('Error updating external availability:', error);
       alert('An error occurred. Please try again.');
     } finally {
-      this.isProcessing = false;
+      this.setProcessing(false);
     }
   }
   
@@ -427,7 +504,7 @@ export class DetailedSessionCardComponent {
       return;
     }
     
-    this.isUpdatingSession = true;
+    this.setUpdatingSession(true);
     this.updateError = '';
     
     try {
@@ -455,7 +532,7 @@ export class DetailedSessionCardComponent {
       console.error('Error updating session confirmation:', error);
       this.updateError = 'An error occurred while updating the session. Please try again.';
     } finally {
-      this.isUpdatingSession = false;
+      this.setUpdatingSession(false);
     }
   }
   
