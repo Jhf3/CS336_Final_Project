@@ -1,4 +1,4 @@
-import { Component, PLATFORM_ID, inject } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
@@ -12,7 +12,7 @@ import { User } from '../../../../types/types';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private platformId = inject(PLATFORM_ID);
   username: string = '';
   isLoading: boolean = false;
@@ -23,6 +23,21 @@ export class LoginComponent {
     private dbService: DatabaseService,
     private router: Router
   ) {}
+  
+  ngOnInit() {
+    // Check if user is already logged in
+    if (isPlatformBrowser(this.platformId)) {
+      const storedUser = localStorage.getItem('currentUser');
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      
+      if (storedUser && isLoggedIn === 'true') {
+        // User is already logged in, redirect to home
+        console.log('User already logged in, redirecting to home');
+        this.router.navigate(['/home']);
+        return;
+      }
+    }
+  }
   
   async onLogin() {
     // Reset messages

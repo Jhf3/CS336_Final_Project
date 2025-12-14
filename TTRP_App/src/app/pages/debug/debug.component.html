@@ -2,7 +2,8 @@
   <app-navbar 
     title="🛠️ Database Service Debug Console" 
     subtitle=""
-    [navigationButtons]="navigationButtons">
+    [navigationButtons]="navigationButtons"
+    [isLoggedIn]="!!currentUser">
   </app-navbar>
   
   <div class="debug-extra-controls">
