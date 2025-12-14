@@ -178,6 +178,45 @@
   color: #6c757d;
 }
 
+.group-code {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.code-display {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--primary-purple);
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.copy-btn {
+  background: var(--gradient-secondary);
+  border: none;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.copy-btn:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-md);
+}
+
+.copy-btn:active {
+  transform: scale(0.95);
+}
+
 .label {
   font-weight: 600;
   color: #495057;

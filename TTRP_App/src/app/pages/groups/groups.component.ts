@@ -229,4 +229,24 @@ export class GroupsComponent implements OnInit, OnDestroy {
       this.router.navigate(['/home']);
     }, 1000);
   }
+  
+  copyGroupCode(groupId: string) {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(groupId).then(() => {
+      this.successMessage = 'Group code copied to clipboard!';
+      
+      // Clear the message after 2 seconds
+      setTimeout(() => {
+        this.successMessage = '';
+        this.cdr.detectChanges();
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy group code:', err);
+      this.errorMessage = 'Failed to copy group code';
+    });
+  }
 }
