@@ -69,9 +69,10 @@
                 <button 
                   class="copy-btn" 
                   (click)="copyGroupCode(group.id)"
-                  title="Copy group code"
+                  [title]="copiedGroupId === group.id ? 'Copied!' : 'Copy group code'"
                 >
-                  📋
+                  <span *ngIf="copiedGroupId !== group.id">📄</span>
+                  <span *ngIf="copiedGroupId === group.id">✓</span>
                 </button>
               </p>
               <p class="group-host">

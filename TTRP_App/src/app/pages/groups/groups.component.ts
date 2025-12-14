@@ -41,6 +41,8 @@ export class GroupsComponent implements OnInit, OnDestroy {
   errorMessage: string = '';
   successMessage: string = '';
   activeTab: 'create' | 'join' | 'myGroups' = 'myGroups';
+  copiedGroupId: string | null = null;
+  private copyTimeout: any = null;
   
   constructor(
     private dbService: DatabaseService,
@@ -69,6 +71,11 @@ export class GroupsComponent implements OnInit, OnDestroy {
     // Clean up subscriptions
     if (this.userGroupsSubscription) {
       this.userGroupsSubscription.unsubscribe();
+    }
+    
+    // Clear copy timeout
+    if (this.copyTimeout) {
+      clearTimeout(this.copyTimeout);
     }
   }
   
@@ -235,13 +242,21 @@ export class GroupsComponent implements OnInit, OnDestroy {
       return;
     }
     
+    // Clear any existing timeout
+    if (this.copyTimeout) {
+      clearTimeout(this.copyTimeout);
+    }
+    
     // Copy to clipboard
     navigator.clipboard.writeText(groupId).then(() => {
       this.successMessage = 'Group code copied to clipboard!';
+      this.copiedGroupId = groupId;
+      this.cdr.detectChanges();
       
-      // Clear the message after 2 seconds
-      setTimeout(() => {
+      // Clear the checkmark and message after 2 seconds
+      this.copyTimeout = setTimeout(() => {
         this.successMessage = '';
+        this.copiedGroupId = null;
         this.cdr.detectChanges();
       }, 2000);
     }).catch(err => {
