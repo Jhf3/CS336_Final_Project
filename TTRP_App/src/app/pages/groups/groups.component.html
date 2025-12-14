@@ -82,6 +82,9 @@
               <p class="group-members">
                 <span class="label">Members:</span> {{ group.memberIds.length }}
               </p>
+              <p class="group-id">
+                <span class="label">GroupID:</span> {{ group.id }}
+              </p>
               <p class="group-created">
                 <span class="label">Created:</span> {{ group.createdAt.toDate() | date:'short' }}
               </p>

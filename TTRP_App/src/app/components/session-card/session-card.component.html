@@ -25,7 +25,8 @@
         [sessionSynopsis]="sessionSynopsis"
         [secretNotes]="secretNotes"
         [isDM]="isDM"
-        [currentUser]="currentUser">
+        [currentUser]="currentUser"
+        (sessionUpdated)="onSessionUpdated($event)">
       </app-detailed-session-card>
     </div>
   </div>

@@ -48,13 +48,14 @@
       <!-- Sessions List Component -->
       <app-session-list 
         *ngIf="upcomingSessions.length > 0" 
-        [sessions]="upcomingSessions">
+        [sessions]="upcomingSessions"
+        (sessionUpdated)="onSessionUpdated($event)">
       </app-session-list>
     </div>
   </main>
 
   <footer class="footer">
-    <p>&copy; 2025 TTRP App - CS336 Final Project</p>
+    <p>&copy; 2025 TTRPG App - CS336 Final Project</p>
   </footer>
 
   <!-- New Session Modal -->
