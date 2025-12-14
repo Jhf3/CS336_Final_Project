@@ -50,7 +50,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     buttons.push(
       { label: 'Manage Groups', route: '/groups', style: 'secondary' },
       { label: 'Campaign History', route: '/campaign-history', style: 'secondary' },
-      { label: 'Debug', route: '/debug', style: 'secondary' }
     );
     
     return buttons;

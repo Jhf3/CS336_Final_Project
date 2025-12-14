@@ -45,10 +45,19 @@ export class DebugComponent implements OnInit {
   loading = false;
   messages: string[] = [];
   
-  constructor(private dbService: DatabaseService) {}
+  constructor(
+    private dbService: DatabaseService,
+    // private cdr: ChangeDetectorRef
+  ) {}
   
   ngOnInit() {
     this.addMessage('Debug component initialized. Ready to test database operations.');
+  }
+  
+  // Helper methods for loading state management
+  private setLoading(loading: boolean) {
+    this.loading = loading;
+    // this.cdr.detectChanges(); // Force change detection when loading state changes
   }
   
   private addMessage(message: string) {
@@ -74,6 +83,7 @@ export class DebugComponent implements OnInit {
   // User Operations
   async createTestUser() {
     this.loading = true;
+    // this.cdr.detectChanges(); // Force change detection when starting load
     try {
       const request: CreateUserRequest = { username: this.testUsername };
       const result = await this.dbService.createUser(request);

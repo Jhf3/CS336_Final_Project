@@ -27,9 +27,15 @@
 
   <div class="session-details">
     <div class="detail-section">
-      <h3>Available Players ({{ availablePlayers.length }})</h3>
-      <div class="player-count">
-        <p>{{ availablePlayers.length }} players confirmed</p>
+      <h3>Available Players ({{ availablePlayersCount }})</h3>
+      <div class="player-list">
+        @if (isLoadingPlayerNames) {
+          <p class="loading">Loading player names...</p>
+        } @else if (availablePlayers.length > 0) {
+          <p><strong>Confirmed players:</strong> {{ availablePlayers.join(', ') }}</p>
+        } @else {
+          <p>No players have confirmed availability yet.</p>
+        }
       </div>
       
       @if (currentUser && isFutureSession) {

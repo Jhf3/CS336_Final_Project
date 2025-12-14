@@ -1,4 +1,4 @@
-import { Component, OnInit, PLATFORM_ID, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
@@ -21,7 +21,8 @@ export class LoginComponent implements OnInit {
   
   constructor(
     private dbService: DatabaseService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
   
   ngOnInit() {
@@ -50,6 +51,7 @@ export class LoginComponent implements OnInit {
     }
     
     this.isLoading = true;
+    this.cdr.detectChanges(); // Force change detection when starting load
     
     try {
       // Try to get existing user
@@ -80,6 +82,7 @@ export class LoginComponent implements OnInit {
       this.errorMessage = 'An error occurred during login. Please try again.';
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges(); // Force change detection when ending load
     }
   }
   
@@ -92,6 +95,7 @@ export class LoginComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
+    this.cdr.detectChanges(); // Force change detection when starting creation
     
     try {
       const createResult = await this.dbService.createUser({
@@ -121,6 +125,7 @@ export class LoginComponent implements OnInit {
       this.errorMessage = 'An error occurred while creating account. Please try again.';
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges(); // Force change detection when ending creation
     }
   }
   
