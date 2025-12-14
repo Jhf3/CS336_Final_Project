@@ -5,3 +5,5 @@
 - Simon Troyer
 
 ## Jacob Time: 1:30
+## Jacob Time: 1:30
+## Simon Time: ~5hr

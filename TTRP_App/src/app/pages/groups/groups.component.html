@@ -63,15 +63,24 @@
           <div *ngFor="let group of userGroups" class="group-card">
             <div class="group-info">
               <h3>{{ group.name }}</h3>
+              <p class="group-code">
+                <span class="label">Group Code:</span> 
+                <code class="code-display">{{ group.id }}</code>
+                <button 
+                  class="copy-btn" 
+                  (click)="copyGroupCode(group.id)"
+                  [title]="copiedGroupId === group.id ? 'Copied!' : 'Copy group code'"
+                >
+                  <span *ngIf="copiedGroupId !== group.id">📄</span>
+                  <span *ngIf="copiedGroupId === group.id">✓</span>
+                </button>
+              </p>
               <p class="group-host">
                 <span class="label">Host:</span> {{ group.hostName }}
                 <span *ngIf="group.hostId === currentUser?.id" class="host-badge">You</span>
               </p>
               <p class="group-members">
                 <span class="label">Members:</span> {{ group.memberIds.length }}
-              </p>
-              <p class="group-id">
-                <span class="label">GroupID:</span> {{ group.id }}
               </p>
               <p class="group-created">
                 <span class="label">Created:</span> {{ group.createdAt.toDate() | date:'short' }}

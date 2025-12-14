@@ -17,7 +17,7 @@ export class CampaignHistoryComponent implements OnInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   
   navigationButtons: NavButton[] = [
-    { label: 'Upcoming Sessions', route: '/home', style: 'primary' }
+    { label: 'Campaign Home', route: '/home', style: 'primary' }
   ];
 
   // User and group data
